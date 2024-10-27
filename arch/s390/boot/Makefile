@@ -35,15 +35,15 @@ obj-$(CONFIG_KMSAN) += kmsan.o
 obj-all := $(obj-y) piggy.o syms.o
 
 targets	:= bzImage section_cmp.boot.data section_cmp.boot.preserved.data $(obj-y)
-targets	+= vmlinux.lds vmlinux vmlinux.bin vmlinux.bin.gz vmlinux.bin.bz2
-targets += vmlinux.bin.xz vmlinux.bin.lzma vmlinux.bin.lzo vmlinux.bin.lz4
-targets += vmlinux.bin.zst info.bin syms.bin vmlinux.syms $(obj-all)
+targets	+= perkelex.lds perkelex perkelex.bin perkelex.bin.gz perkelex.bin.bz2
+targets += perkelex.bin.xz perkelex.bin.lzma perkelex.bin.lzo perkelex.bin.lz4
+targets += perkelex.bin.zst info.bin syms.bin perkelex.syms $(obj-all)
 targets += relocs.S
 
 OBJECTS := $(addprefix $(obj)/,$(obj-y))
 OBJECTS_ALL := $(addprefix $(obj)/,$(obj-all))
 
-clean-files += vmlinux.map
+clean-files += perkelex.map
 
 quiet_cmd_section_cmp = SECTCMP $*
 define cmd_section_cmp
@@ -58,19 +58,19 @@ define cmd_section_cmp
 	touch $@
 endef
 
-$(obj)/bzImage: $(obj)/vmlinux $(obj)/section_cmp.boot.data $(obj)/section_cmp.boot.preserved.data FORCE
+$(obj)/bzImage: $(obj)/perkelex $(obj)/section_cmp.boot.data $(obj)/section_cmp.boot.preserved.data FORCE
 	$(call if_changed,objcopy)
 
-$(obj)/section_cmp%: vmlinux $(obj)/vmlinux FORCE
+$(obj)/section_cmp%: perkelex $(obj)/perkelex FORCE
 	$(call if_changed,section_cmp)
 
-LDFLAGS_vmlinux-$(CONFIG_LD_ORPHAN_WARN) := --orphan-handling=$(CONFIG_LD_ORPHAN_WARN_LEVEL)
-LDFLAGS_vmlinux := $(LDFLAGS_vmlinux-y) --oformat $(LD_BFD) -e startup $(if $(CONFIG_VMLINUX_MAP),-Map=$(obj)/vmlinux.map) --build-id=sha1 -T
-$(obj)/vmlinux: $(obj)/vmlinux.lds $(OBJECTS_ALL) FORCE
+LDFLAGS_perkelex-$(CONFIG_LD_ORPHAN_WARN) := --orphan-handling=$(CONFIG_LD_ORPHAN_WARN_LEVEL)
+LDFLAGS_perkelex := $(LDFLAGS_perkelex-y) --oformat $(LD_BFD) -e startup $(if $(CONFIG_VMLINUX_MAP),-Map=$(obj)/perkelex.map) --build-id=sha1 -T
+$(obj)/perkelex: $(obj)/perkelex.lds $(OBJECTS_ALL) FORCE
 	$(call if_changed,ld)
 
-LDFLAGS_vmlinux.syms := $(LDFLAGS_vmlinux-y) --oformat $(LD_BFD) -e startup -T
-$(obj)/vmlinux.syms: $(obj)/vmlinux.lds $(OBJECTS) FORCE
+LDFLAGS_perkelex.syms := $(LDFLAGS_perkelex-y) --oformat $(LD_BFD) -e startup -T
+$(obj)/perkelex.syms: $(obj)/perkelex.lds $(OBJECTS) FORCE
 	$(call if_changed,ld)
 
 quiet_cmd_dumpsyms = DUMPSYMS $<
@@ -78,27 +78,27 @@ define cmd_dumpsyms
 	$(NM) -n -S --format=bsd "$<" | sed -nE 's/^0*([0-9a-fA-F]+) 0*([0-9a-fA-F]+) [tT] ([^ ]*)$$/\1 \2 \3/p' | tr '\n' '\0' > "$@"
 endef
 
-$(obj)/syms.bin: $(obj)/vmlinux.syms FORCE
+$(obj)/syms.bin: $(obj)/perkelex.syms FORCE
 	$(call if_changed,dumpsyms)
 
 OBJCOPYFLAGS_syms.o := -I binary -O elf64-s390 -B s390:64-bit --rename-section .data=.decompressor.syms
 $(obj)/syms.o: $(obj)/syms.bin FORCE
 	$(call if_changed,objcopy)
 
-OBJCOPYFLAGS_info.bin := -O binary --only-section=.vmlinux.info --set-section-flags .vmlinux.info=alloc,load
-$(obj)/info.bin: vmlinux FORCE
+OBJCOPYFLAGS_info.bin := -O binary --only-section=.perkelex.info --set-section-flags .perkelex.info=alloc,load
+$(obj)/info.bin: perkelex FORCE
 	$(call if_changed,objcopy)
 
-OBJCOPYFLAGS_info.o := -I binary -O elf64-s390 -B s390:64-bit --rename-section .data=.vmlinux.info
+OBJCOPYFLAGS_info.o := -I binary -O elf64-s390 -B s390:64-bit --rename-section .data=.perkelex.info
 $(obj)/info.o: $(obj)/info.bin FORCE
 	$(call if_changed,objcopy)
 
-OBJCOPYFLAGS_vmlinux.bin := -O binary --remove-section=.comment --remove-section=.vmlinux.info -S
-$(obj)/vmlinux.bin: vmlinux FORCE
+OBJCOPYFLAGS_perkelex.bin := -O binary --remove-section=.comment --remove-section=.perkelex.info -S
+$(obj)/perkelex.bin: perkelex FORCE
 	$(call if_changed,objcopy)
 
-# relocs.S is created by the vmlinux postlink step.
-$(obj)/relocs.S: vmlinux
+# relocs.S is created by the perkelex postlink step.
+$(obj)/relocs.S: perkelex
 	@true
 
 suffix-$(CONFIG_KERNEL_GZIP)  := .gz
@@ -109,21 +109,21 @@ suffix-$(CONFIG_KERNEL_LZO)  := .lzo
 suffix-$(CONFIG_KERNEL_XZ)  := .xz
 suffix-$(CONFIG_KERNEL_ZSTD)  := .zst
 
-$(obj)/vmlinux.bin.gz: $(obj)/vmlinux.bin FORCE
+$(obj)/perkelex.bin.gz: $(obj)/perkelex.bin FORCE
 	$(call if_changed,gzip)
-$(obj)/vmlinux.bin.bz2: $(obj)/vmlinux.bin FORCE
+$(obj)/perkelex.bin.bz2: $(obj)/perkelex.bin FORCE
 	$(call if_changed,bzip2_with_size)
-$(obj)/vmlinux.bin.lz4: $(obj)/vmlinux.bin FORCE
+$(obj)/perkelex.bin.lz4: $(obj)/perkelex.bin FORCE
 	$(call if_changed,lz4_with_size)
-$(obj)/vmlinux.bin.lzma: $(obj)/vmlinux.bin FORCE
+$(obj)/perkelex.bin.lzma: $(obj)/perkelex.bin FORCE
 	$(call if_changed,lzma_with_size)
-$(obj)/vmlinux.bin.lzo: $(obj)/vmlinux.bin FORCE
+$(obj)/perkelex.bin.lzo: $(obj)/perkelex.bin FORCE
 	$(call if_changed,lzo_with_size)
-$(obj)/vmlinux.bin.xz: $(obj)/vmlinux.bin FORCE
+$(obj)/perkelex.bin.xz: $(obj)/perkelex.bin FORCE
 	$(call if_changed,xzkern_with_size)
-$(obj)/vmlinux.bin.zst: $(obj)/vmlinux.bin FORCE
+$(obj)/perkelex.bin.zst: $(obj)/perkelex.bin FORCE
 	$(call if_changed,zstd22_with_size)
 
-OBJCOPYFLAGS_piggy.o := -I binary -O elf64-s390 -B s390:64-bit --rename-section .data=.vmlinux.bin.compressed
-$(obj)/piggy.o: $(obj)/vmlinux.bin$(suffix-y) FORCE
+OBJCOPYFLAGS_piggy.o := -I binary -O elf64-s390 -B s390:64-bit --rename-section .data=.perkelex.bin.compressed
+$(obj)/piggy.o: $(obj)/perkelex.bin$(suffix-y) FORCE
 	$(call if_changed,objcopy)

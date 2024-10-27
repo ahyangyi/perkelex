@@ -8,11 +8,11 @@ boot	:= arch/loongarch/boot
 KBUILD_DEFCONFIG := loongson3_defconfig
 KBUILD_DTBS      := dtbs
 
-image-name-y			:= vmlinux
-image-name-$(CONFIG_EFI_ZBOOT)	:= vmlinuz
+image-name-y			:= perkelex
+image-name-$(CONFIG_EFI_ZBOOT)	:= perkelez
 
 ifndef CONFIG_EFI_STUB
-KBUILD_IMAGE	:= $(boot)/vmlinux.elf
+KBUILD_IMAGE	:= $(boot)/perkelex.elf
 else
 KBUILD_IMAGE	:= $(boot)/$(image-name-y).efi
 endif
@@ -63,7 +63,7 @@ cflags-y		+= -mabi=lp64s
 endif
 
 cflags-y			+= -pipe $(CC_FLAGS_NO_FPU)
-LDFLAGS_vmlinux			+= -static -n -nostdlib
+LDFLAGS_perkelex			+= -static -n -nostdlib
 
 # When the assembler supports explicit relocation hint, we must use it.
 # GCC may have -mexplicit-relocs off by default if it was built with an old
@@ -111,7 +111,7 @@ KBUILD_RUSTFLAGS_MODULE		+= -Zdirect-access-external-data=no
 ifeq ($(CONFIG_RELOCATABLE),y)
 KBUILD_CFLAGS_KERNEL		+= -fPIE
 KBUILD_RUSTFLAGS_KERNEL		+= -Crelocation-model=pie
-LDFLAGS_vmlinux			+= -static -pie --no-dynamic-linker -z notext $(call ld-option, --apply-dynamic-relocs)
+LDFLAGS_perkelex			+= -static -pie --no-dynamic-linker -z notext $(call ld-option, --apply-dynamic-relocs)
 endif
 
 cflags-y += $(call cc-option, -mno-check-zero-division)
@@ -171,9 +171,9 @@ vdso-install-y += arch/loongarch/vdso/vdso.so.dbg
 
 all:	$(notdir $(KBUILD_IMAGE)) $(KBUILD_DTBS)
 
-vmlinuz.efi: vmlinux.efi
+perkelez.efi: perkelex.efi
 
-vmlinux.elf vmlinux.efi vmlinuz.efi: vmlinux
+perkelex.elf perkelex.efi perkelez.efi: perkelex
 	$(Q)$(MAKE) $(build)=$(boot) $(bootvars-y) $(boot)/$@
 
 install:

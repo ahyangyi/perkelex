@@ -9,8 +9,8 @@
 #
 
 hostprogs	:= tools/mkbb tools/objstrip
-targets		:= vmlinux.gz vmlinux \
-		   vmlinux.nh tools/lxboot tools/bootlx tools/bootph \
+targets		:= perkelex.gz perkelex \
+		   perkelex.nh tools/lxboot tools/bootlx tools/bootph \
 		   tools/bootpzh bootloader bootpheader bootpzheader 
 OBJSTRIP	:= $(obj)/tools/objstrip
 
@@ -18,28 +18,28 @@ KBUILD_HOSTCFLAGS := -Wall -I$(objtree)/usr/include
 BOOTCFLAGS	+= -I$(objtree)/$(obj) -I$(srctree)/$(obj)
 
 # SRM bootable image.  Copy to offset 512 of a partition.
-$(obj)/bootimage: $(addprefix $(obj)/tools/,mkbb lxboot bootlx) $(obj)/vmlinux.nh
-	( cat $(obj)/tools/lxboot $(obj)/tools/bootlx $(obj)/vmlinux.nh ) > $@ 
+$(obj)/bootimage: $(addprefix $(obj)/tools/,mkbb lxboot bootlx) $(obj)/perkelex.nh
+	( cat $(obj)/tools/lxboot $(obj)/tools/bootlx $(obj)/perkelex.nh ) > $@ 
 	$(obj)/tools/mkbb $@ $(obj)/tools/lxboot
 	@echo '  Bootimage $@ is ready'
 
 # BOOTP bootable image.  Define INITRD during make to append initrd image.
-$(obj)/bootpfile: $(obj)/tools/bootph $(obj)/vmlinux.nh
-	cat $(obj)/tools/bootph $(obj)/vmlinux.nh > $@
+$(obj)/bootpfile: $(obj)/tools/bootph $(obj)/perkelex.nh
+	cat $(obj)/tools/bootph $(obj)/perkelex.nh > $@
 ifdef INITRD
 	cat $(INITRD) >> $@
 endif
 
 # Compressed kernel BOOTP bootable image.
 # Define INITRD during make to append initrd image.
-$(obj)/bootpzfile: $(obj)/tools/bootpzh $(obj)/vmlinux.nh.gz
-	cat $(obj)/tools/bootpzh $(obj)/vmlinux.nh.gz > $@
+$(obj)/bootpzfile: $(obj)/tools/bootpzh $(obj)/perkelex.nh.gz
+	cat $(obj)/tools/bootpzh $(obj)/perkelex.nh.gz > $@
 ifdef INITRD
 	cat $(INITRD) >> $@
 endif
 
 # Compressed kernel image
-$(obj)/vmlinux.gz: $(obj)/vmlinux FORCE
+$(obj)/perkelex.gz: $(obj)/perkelex FORCE
 	$(call if_changed,gzip)
 	@echo '  Kernel $@ is ready'
 
@@ -47,8 +47,8 @@ $(obj)/main.o: $(obj)/ksize.h
 $(obj)/bootp.o: $(obj)/ksize.h
 $(obj)/bootpz.o: $(obj)/kzsize.h
 
-$(obj)/ksize.h: $(obj)/vmlinux.nh FORCE
-	echo "#define KERNEL_SIZE `ls -l $(obj)/vmlinux.nh | awk '{print $$5}'`" > $@T
+$(obj)/ksize.h: $(obj)/perkelex.nh FORCE
+	echo "#define KERNEL_SIZE `ls -l $(obj)/perkelex.nh | awk '{print $$5}'`" > $@T
 ifdef INITRD
 	[ -f $(INITRD) ] || exit 1
 	echo "#define INITRD_IMAGE_SIZE `ls -l $(INITRD) | awk '{print $$5}'`" >> $@T
@@ -56,9 +56,9 @@ endif
 	cmp -s $@T $@ || mv -f $@T $@
 	rm -f $@T
 
-$(obj)/kzsize.h: $(obj)/vmlinux.nh.gz FORCE
-	echo "#define KERNEL_SIZE `ls -l $(obj)/vmlinux.nh | awk '{print $$5}'`" > $@T
-	echo "#define KERNEL_Z_SIZE `ls -l $(obj)/vmlinux.nh.gz | awk '{print $$5}'`" >> $@T
+$(obj)/kzsize.h: $(obj)/perkelex.nh.gz FORCE
+	echo "#define KERNEL_SIZE `ls -l $(obj)/perkelex.nh | awk '{print $$5}'`" > $@T
+	echo "#define KERNEL_Z_SIZE `ls -l $(obj)/perkelex.nh.gz | awk '{print $$5}'`" >> $@T
 ifdef INITRD
 	[ -f $(INITRD) ] || exit 1
 	echo "#define INITRD_IMAGE_SIZE `ls -l $(INITRD) | awk '{print $$5}'`" >> $@T
@@ -69,22 +69,22 @@ endif
 quiet_cmd_strip = STRIP  $@
       cmd_strip = $(STRIP) -o $@ $<
 
-$(obj)/vmlinux: vmlinux FORCE
+$(obj)/perkelex: perkelex FORCE
 	$(call if_changed,strip)
 
 quiet_cmd_objstrip = OBJSTRIP $@
       cmd_objstrip = $(OBJSTRIP) $(OSFLAGS_$(@F)) $< $@
 
-OSFLAGS_vmlinux.nh	:= -v
+OSFLAGS_perkelex.nh	:= -v
 OSFLAGS_lxboot		:= -p
 OSFLAGS_bootlx		:= -vb
 OSFLAGS_bootph		:= -vb
 OSFLAGS_bootpzh		:= -vb
 
-$(obj)/vmlinux.nh: vmlinux $(OBJSTRIP) FORCE
+$(obj)/perkelex.nh: perkelex $(OBJSTRIP) FORCE
 	$(call if_changed,objstrip)
 
-$(obj)/vmlinux.nh.gz: $(obj)/vmlinux.nh FORCE
+$(obj)/perkelex.nh.gz: $(obj)/perkelex.nh FORCE
 	$(call if_changed,gzip)
 
 $(obj)/tools/lxboot: $(obj)/bootloader $(OBJSTRIP) FORCE

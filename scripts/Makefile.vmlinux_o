@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 
 PHONY := __default
-__default: vmlinux.o modules.builtin.modinfo modules.builtin
+__default: perkelex.o modules.builtin.modinfo modules.builtin
 
 include include/config/auto.conf
 include $(srctree)/scripts/Kbuild.include
@@ -18,7 +18,7 @@ quiet_cmd_gen_initcalls_lds = GEN     $@
 	$(PERL) $(real-prereqs) > $@
 
 .tmp_initcalls.lds: $(srctree)/scripts/generate_initcall_order.pl \
-		vmlinux.a $(KBUILD_VMLINUX_LIBS) FORCE
+		perkelex.a $(KBUILD_VMLINUX_LIBS) FORCE
 	$(call if_changed,gen_initcalls_lds)
 
 targets := .tmp_initcalls.lds
@@ -27,44 +27,44 @@ ifdef CONFIG_LTO_CLANG
 initcalls-lds := .tmp_initcalls.lds
 endif
 
-# objtool for vmlinux.o
+# objtool for perkelex.o
 # ---------------------------------------------------------------------------
 #
 # For LTO and IBT, objtool doesn't run on individual translation units.
-# Run everything on vmlinux instead.
+# Run everything on perkelex instead.
 
 objtool-enabled := $(or $(delay-objtool),$(CONFIG_NOINSTR_VALIDATION))
 
-vmlinux-objtool-args-$(delay-objtool)			+= $(objtool-args-y)
-vmlinux-objtool-args-$(CONFIG_GCOV_KERNEL)		+= --no-unreachable
-vmlinux-objtool-args-$(CONFIG_NOINSTR_VALIDATION)	+= --noinstr \
+perkelex-objtool-args-$(delay-objtool)			+= $(objtool-args-y)
+perkelex-objtool-args-$(CONFIG_GCOV_KERNEL)		+= --no-unreachable
+perkelex-objtool-args-$(CONFIG_NOINSTR_VALIDATION)	+= --noinstr \
 							   $(if $(or $(CONFIG_MITIGATION_UNRET_ENTRY),$(CONFIG_MITIGATION_SRSO)), --unret)
 
-objtool-args = $(vmlinux-objtool-args-y) --link
+objtool-args = $(perkelex-objtool-args-y) --link
 
-# Link of vmlinux.o used for section mismatch analysis
+# Link of perkelex.o used for section mismatch analysis
 # ---------------------------------------------------------------------------
 
-vmlinux-o-ld-args-$(CONFIG_BUILTIN_MODULE_RANGES)	+= -Map=$@.map
+perkelex-o-ld-args-$(CONFIG_BUILTIN_MODULE_RANGES)	+= -Map=$@.map
 
-quiet_cmd_ld_vmlinux.o = LD      $@
-      cmd_ld_vmlinux.o = \
+quiet_cmd_ld_perkelex.o = LD      $@
+      cmd_ld_perkelex.o = \
 	$(LD) ${KBUILD_LDFLAGS} -r -o $@ \
-	$(vmlinux-o-ld-args-y) \
+	$(perkelex-o-ld-args-y) \
 	$(addprefix -T , $(initcalls-lds)) \
-	--whole-archive vmlinux.a --no-whole-archive \
+	--whole-archive perkelex.a --no-whole-archive \
 	--start-group $(KBUILD_VMLINUX_LIBS) --end-group \
 	$(cmd_objtool)
 
-define rule_ld_vmlinux.o
-	$(call cmd_and_savecmd,ld_vmlinux.o)
+define rule_ld_perkelex.o
+	$(call cmd_and_savecmd,ld_perkelex.o)
 	$(call cmd,gen_objtooldep)
 endef
 
-vmlinux.o: $(initcalls-lds) vmlinux.a $(KBUILD_VMLINUX_LIBS) FORCE
-	$(call if_changed_rule,ld_vmlinux.o)
+perkelex.o: $(initcalls-lds) perkelex.a $(KBUILD_VMLINUX_LIBS) FORCE
+	$(call if_changed_rule,ld_perkelex.o)
 
-targets += vmlinux.o
+targets += perkelex.o
 
 # module.builtin.modinfo
 # ---------------------------------------------------------------------------
@@ -72,7 +72,7 @@ targets += vmlinux.o
 OBJCOPYFLAGS_modules.builtin.modinfo := -j .modinfo -O binary
 
 targets += modules.builtin.modinfo
-modules.builtin.modinfo: vmlinux.o FORCE
+modules.builtin.modinfo: perkelex.o FORCE
 	$(call if_changed,objcopy)
 
 # module.builtin

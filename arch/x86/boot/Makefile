@@ -16,7 +16,7 @@
 
 SVGA_MODE	:= -DSVGA_MODE=NORMAL_VGA
 
-targets		:= vmlinux.bin setup.bin setup.elf bzImage
+targets		:= perkelex.bin setup.bin setup.elf bzImage
 targets		+= fdimage fdimage144 fdimage288 image.iso hdimage
 subdir-		:= compressed
 
@@ -62,15 +62,15 @@ $(obj)/bzImage: asflags-y  := $(SVGA_MODE)
 
 quiet_cmd_image = BUILD   $@
 silent_redirect_image = >/dev/null
-cmd_image = $(obj)/tools/build $(obj)/setup.bin $(obj)/vmlinux.bin \
+cmd_image = $(obj)/tools/build $(obj)/setup.bin $(obj)/perkelex.bin \
 			       $(obj)/zoffset.h $@ $($(quiet)redirect_image)
 
-$(obj)/bzImage: $(obj)/setup.bin $(obj)/vmlinux.bin $(obj)/tools/build FORCE
+$(obj)/bzImage: $(obj)/setup.bin $(obj)/perkelex.bin $(obj)/tools/build FORCE
 	$(call if_changed,image)
 	@$(kecho) 'Kernel: $@ is ready' ' (#'$(or $(KBUILD_BUILD_VERSION),`cat .version`)')'
 
-OBJCOPYFLAGS_vmlinux.bin := -O binary -R .note -R .comment -S
-$(obj)/vmlinux.bin: $(obj)/compressed/vmlinux FORCE
+OBJCOPYFLAGS_perkelex.bin := -O binary -R .note -R .comment -S
+$(obj)/perkelex.bin: $(obj)/compressed/perkelex FORCE
 	$(call if_changed,objcopy)
 
 SETUP_OBJS = $(addprefix $(obj)/,$(setup-y))
@@ -81,7 +81,7 @@ quiet_cmd_zoffset = ZOFFSET $@
       cmd_zoffset = $(NM) $< | sed -n $(sed-zoffset) > $@
 
 targets += zoffset.h
-$(obj)/zoffset.h: $(obj)/compressed/vmlinux FORCE
+$(obj)/zoffset.h: $(obj)/compressed/perkelex FORCE
 	$(call if_changed,zoffset)
 
 
@@ -96,7 +96,7 @@ OBJCOPYFLAGS_setup.bin	:= -O binary
 $(obj)/setup.bin: $(obj)/setup.elf FORCE
 	$(call if_changed,objcopy)
 
-$(obj)/compressed/vmlinux: FORCE
+$(obj)/compressed/perkelex: FORCE
 	$(Q)$(MAKE) $(build)=$(obj)/compressed $@
 
 # Set this if you want to pass append arguments to the

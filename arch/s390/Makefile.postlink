@@ -3,8 +3,8 @@
 # Post-link s390 pass
 # ===========================================================================
 #
-# 1. Separate relocations from vmlinux into relocs.S.
-# 2. Strip relocations from vmlinux.
+# 1. Separate relocations from perkelex into relocs.S.
+# 2. Strip relocations from perkelex.
 
 PHONY := __archpost
 __archpost:
@@ -24,7 +24,7 @@ quiet_cmd_strip_relocs = RSTRIP  $@
 	$(OBJCOPY) --remove-section='.rel.*' --remove-section='.rel__*' \
 		   --remove-section='.rela.*' --remove-section='.rela__*' $@
 
-vmlinux: FORCE
+perkelex: FORCE
 	$(call cmd,relocs)
 	$(call cmd,strip_relocs)
 

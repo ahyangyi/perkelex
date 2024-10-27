@@ -2,12 +2,12 @@
 #
 # linux/arch/parisc/boot/compressed/Makefile
 #
-# create a compressed self-extracting vmlinux image from the original vmlinux
+# create a compressed self-extracting perkelex image from the original perkelex
 #
 
 OBJECTS := head.o real2.o firmware.o misc.o piggy.o
-targets := vmlinux.lds vmlinux vmlinux.bin vmlinux.bin.gz vmlinux.bin.bz2
-targets += vmlinux.bin.xz vmlinux.bin.lzma vmlinux.bin.lzo vmlinux.bin.lz4
+targets := perkelex.lds perkelex perkelex.bin perkelex.bin.gz perkelex.bin.bz2
+targets += perkelex.bin.xz perkelex.bin.lzma perkelex.bin.lzo perkelex.bin.lz4
 targets += $(OBJECTS) sizes.h
 
 KBUILD_CFLAGS := -D__KERNEL__ -O2 -DBOOTLOADER
@@ -19,8 +19,8 @@ ifndef CONFIG_64BIT
 KBUILD_CFLAGS += -mfast-indirect-calls
 endif
 
-LDFLAGS_vmlinux := -X -e startup --as-needed -T
-$(obj)/vmlinux: $(obj)/vmlinux.lds $(addprefix $(obj)/, $(OBJECTS)) $(LIBGCC) FORCE
+LDFLAGS_perkelex := -X -e startup --as-needed -T
+$(obj)/perkelex: $(obj)/perkelex.lds $(addprefix $(obj)/, $(OBJECTS)) $(LIBGCC) FORCE
 	$(call if_changed,ld)
 
 sed-sizes := -e 's/^\([0-9a-fA-F]*\) . \(__bss_start\|_end\|parisc_kernel_start\)$$/\#define SZ\2 0x\1/p'
@@ -28,7 +28,7 @@ sed-sizes := -e 's/^\([0-9a-fA-F]*\) . \(__bss_start\|_end\|parisc_kernel_start\
 quiet_cmd_sizes = GEN $@
       cmd_sizes = $(NM) $< | sed -n $(sed-sizes) > $@
 
-$(obj)/sizes.h: vmlinux FORCE
+$(obj)/sizes.h: perkelex FORCE
 	$(call if_changed,sizes)
 
 AFLAGS_head.o += -I$(objtree)/$(obj) -DBOOTLOADER
@@ -39,11 +39,11 @@ $(obj)/misc.o: $(obj)/sizes.h
 
 AFLAGS_real2.o += -DBOOTLOADER
 
-CPPFLAGS_vmlinux.lds += -I$(objtree)/$(obj) -DBOOTLOADER
-$(obj)/vmlinux.lds: $(obj)/sizes.h
+CPPFLAGS_perkelex.lds += -I$(objtree)/$(obj) -DBOOTLOADER
+$(obj)/perkelex.lds: $(obj)/sizes.h
 
-OBJCOPYFLAGS_vmlinux.bin := -R .comment -R .note -S
-$(obj)/vmlinux.bin: vmlinux FORCE
+OBJCOPYFLAGS_perkelex.bin := -R .comment -R .note -S
+$(obj)/perkelex.bin: perkelex FORCE
 	$(call if_changed,objcopy)
 
 suffix-$(CONFIG_KERNEL_GZIP)  := gz
@@ -53,19 +53,19 @@ suffix-$(CONFIG_KERNEL_LZMA)  := lzma
 suffix-$(CONFIG_KERNEL_LZO)  := lzo
 suffix-$(CONFIG_KERNEL_XZ)  := xz
 
-$(obj)/vmlinux.bin.gz: $(obj)/vmlinux.bin FORCE
+$(obj)/perkelex.bin.gz: $(obj)/perkelex.bin FORCE
 	$(call if_changed,gzip)
-$(obj)/vmlinux.bin.bz2: $(obj)/vmlinux.bin FORCE
+$(obj)/perkelex.bin.bz2: $(obj)/perkelex.bin FORCE
 	$(call if_changed,bzip2_with_size)
-$(obj)/vmlinux.bin.lz4: $(obj)/vmlinux.bin FORCE
+$(obj)/perkelex.bin.lz4: $(obj)/perkelex.bin FORCE
 	$(call if_changed,lz4_with_size)
-$(obj)/vmlinux.bin.lzma: $(obj)/vmlinux.bin FORCE
+$(obj)/perkelex.bin.lzma: $(obj)/perkelex.bin FORCE
 	$(call if_changed,lzma_with_size)
-$(obj)/vmlinux.bin.lzo: $(obj)/vmlinux.bin FORCE
+$(obj)/perkelex.bin.lzo: $(obj)/perkelex.bin FORCE
 	$(call if_changed,lzo_with_size)
-$(obj)/vmlinux.bin.xz: $(obj)/vmlinux.bin FORCE
+$(obj)/perkelex.bin.xz: $(obj)/perkelex.bin FORCE
 	$(call if_changed,xzkern_with_size)
 
 LDFLAGS_piggy.o := -r --format binary --oformat $(LD_BFD) -T
-$(obj)/piggy.o: $(obj)/vmlinux.scr $(obj)/vmlinux.bin.$(suffix-y) FORCE
+$(obj)/piggy.o: $(obj)/perkelex.scr $(obj)/perkelex.bin.$(suffix-y) FORCE
 	$(call if_changed,ld)

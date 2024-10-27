@@ -2,23 +2,23 @@
 #
 # linux/arch/x86/boot/compressed/Makefile
 #
-# create a compressed vmlinux image from the original vmlinux
+# create a compressed perkelex image from the original perkelex
 #
-# vmlinuz is:
+# perkelez is:
 #	decompression code (*.o)
 #	asm globals (piggy.S), including:
-#		vmlinux.bin.(gz|bz2|lzma|...)
+#		perkelex.bin.(gz|bz2|lzma|...)
 #
-# vmlinux.bin is:
-#	vmlinux stripped of debugging and comments
-# vmlinux.bin.all is:
-#	vmlinux.bin + vmlinux.relocs
-# vmlinux.bin.(gz|bz2|lzma|...) is:
+# perkelex.bin is:
+#	perkelex stripped of debugging and comments
+# perkelex.bin.all is:
+#	perkelex.bin + perkelex.relocs
+# perkelex.bin.(gz|bz2|lzma|...) is:
 #	(see scripts/Makefile.lib size_append)
-#	compressed vmlinux.bin.all + u32 size of vmlinux.bin.all
+#	compressed perkelex.bin.all + u32 size of perkelex.bin.all
 
-targets := vmlinux vmlinux.bin vmlinux.bin.gz vmlinux.bin.bz2 vmlinux.bin.lzma \
-	vmlinux.bin.xz vmlinux.bin.lzo vmlinux.bin.lz4 vmlinux.bin.zst
+targets := perkelex perkelex.bin perkelex.bin.gz perkelex.bin.bz2 perkelex.bin.lzma \
+	perkelex.bin.xz perkelex.bin.lzo perkelex.bin.lz4 perkelex.bin.zst
 
 # CLANG_FLAGS must come before any cc-disable-warning or cc-option calls in
 # case of cross compiling, as it has the '--target=' flag, which is needed to
@@ -55,20 +55,20 @@ KBUILD_LDFLAGS := -m elf_$(UTS_MACHINE)
 KBUILD_LDFLAGS += $(call ld-option,--no-ld-generated-unwind-info)
 # Compressed kernel should be built as PIE since it may be loaded at any
 # address by the bootloader.
-LDFLAGS_vmlinux := -pie $(call ld-option, --no-dynamic-linker)
+LDFLAGS_perkelex := -pie $(call ld-option, --no-dynamic-linker)
 ifdef CONFIG_LD_ORPHAN_WARN
-LDFLAGS_vmlinux += --orphan-handling=$(CONFIG_LD_ORPHAN_WARN_LEVEL)
+LDFLAGS_perkelex += --orphan-handling=$(CONFIG_LD_ORPHAN_WARN_LEVEL)
 endif
-LDFLAGS_vmlinux += -z noexecstack
+LDFLAGS_perkelex += -z noexecstack
 ifeq ($(CONFIG_LD_IS_BFD),y)
-LDFLAGS_vmlinux += $(call ld-option,--no-warn-rwx-segments)
+LDFLAGS_perkelex += $(call ld-option,--no-warn-rwx-segments)
 endif
 ifeq ($(CONFIG_EFI_STUB),y)
 # ensure that the static EFI stub library will be pulled in, even if it is
 # never referenced explicitly from the startup code
-LDFLAGS_vmlinux += -u efi_pe_entry
+LDFLAGS_perkelex += -u efi_pe_entry
 endif
-LDFLAGS_vmlinux += -T
+LDFLAGS_perkelex += -T
 
 hostprogs	:= mkpiggy
 HOST_EXTRACFLAGS += -I$(srctree)/tools/include
@@ -80,62 +80,62 @@ quiet_cmd_voffset = VOFFSET $@
 
 targets += ../voffset.h
 
-$(obj)/../voffset.h: vmlinux FORCE
+$(obj)/../voffset.h: perkelex FORCE
 	$(call if_changed,voffset)
 
 $(obj)/misc.o: $(obj)/../voffset.h
 
-vmlinux-objs-y := $(obj)/vmlinux.lds $(obj)/kernel_info.o $(obj)/head_$(BITS).o \
+perkelex-objs-y := $(obj)/perkelex.lds $(obj)/kernel_info.o $(obj)/head_$(BITS).o \
 	$(obj)/misc.o $(obj)/string.o $(obj)/cmdline.o $(obj)/error.o \
 	$(obj)/piggy.o $(obj)/cpuflags.o
 
-vmlinux-objs-$(CONFIG_EARLY_PRINTK) += $(obj)/early_serial_console.o
-vmlinux-objs-$(CONFIG_RANDOMIZE_BASE) += $(obj)/kaslr.o
+perkelex-objs-$(CONFIG_EARLY_PRINTK) += $(obj)/early_serial_console.o
+perkelex-objs-$(CONFIG_RANDOMIZE_BASE) += $(obj)/kaslr.o
 ifdef CONFIG_X86_64
-	vmlinux-objs-y += $(obj)/ident_map_64.o
-	vmlinux-objs-y += $(obj)/idt_64.o $(obj)/idt_handlers_64.o
-	vmlinux-objs-$(CONFIG_AMD_MEM_ENCRYPT) += $(obj)/mem_encrypt.o
-	vmlinux-objs-y += $(obj)/pgtable_64.o
-	vmlinux-objs-$(CONFIG_AMD_MEM_ENCRYPT) += $(obj)/sev.o
+	perkelex-objs-y += $(obj)/ident_map_64.o
+	perkelex-objs-y += $(obj)/idt_64.o $(obj)/idt_handlers_64.o
+	perkelex-objs-$(CONFIG_AMD_MEM_ENCRYPT) += $(obj)/mem_encrypt.o
+	perkelex-objs-y += $(obj)/pgtable_64.o
+	perkelex-objs-$(CONFIG_AMD_MEM_ENCRYPT) += $(obj)/sev.o
 endif
 
-vmlinux-objs-$(CONFIG_ACPI) += $(obj)/acpi.o
-vmlinux-objs-$(CONFIG_INTEL_TDX_GUEST) += $(obj)/tdx.o $(obj)/tdcall.o $(obj)/tdx-shared.o
-vmlinux-objs-$(CONFIG_UNACCEPTED_MEMORY) += $(obj)/mem.o
+perkelex-objs-$(CONFIG_ACPI) += $(obj)/acpi.o
+perkelex-objs-$(CONFIG_INTEL_TDX_GUEST) += $(obj)/tdx.o $(obj)/tdcall.o $(obj)/tdx-shared.o
+perkelex-objs-$(CONFIG_UNACCEPTED_MEMORY) += $(obj)/mem.o
 
-vmlinux-objs-$(CONFIG_EFI) += $(obj)/efi.o
-vmlinux-objs-$(CONFIG_EFI_MIXED) += $(obj)/efi_mixed.o
-vmlinux-libs-$(CONFIG_EFI_STUB) += $(objtree)/drivers/firmware/efi/libstub/lib.a
+perkelex-objs-$(CONFIG_EFI) += $(obj)/efi.o
+perkelex-objs-$(CONFIG_EFI_MIXED) += $(obj)/efi_mixed.o
+perkelex-libs-$(CONFIG_EFI_STUB) += $(objtree)/drivers/firmware/efi/libstub/lib.a
 
-$(obj)/vmlinux: $(vmlinux-objs-y) $(vmlinux-libs-y) FORCE
+$(obj)/perkelex: $(perkelex-objs-y) $(perkelex-libs-y) FORCE
 	$(call if_changed,ld)
 
-OBJCOPYFLAGS_vmlinux.bin :=  -R .comment -S
-$(obj)/vmlinux.bin: vmlinux FORCE
+OBJCOPYFLAGS_perkelex.bin :=  -R .comment -S
+$(obj)/perkelex.bin: perkelex FORCE
 	$(call if_changed,objcopy)
 
-targets += $(patsubst $(obj)/%,%,$(vmlinux-objs-y)) vmlinux.bin.all vmlinux.relocs
+targets += $(patsubst $(obj)/%,%,$(perkelex-objs-y)) perkelex.bin.all perkelex.relocs
 
-# vmlinux.relocs is created by the vmlinux postlink step.
-$(obj)/vmlinux.relocs: vmlinux
+# perkelex.relocs is created by the perkelex postlink step.
+$(obj)/perkelex.relocs: perkelex
 	@true
 
-vmlinux.bin.all-y := $(obj)/vmlinux.bin
-vmlinux.bin.all-$(CONFIG_X86_NEED_RELOCS) += $(obj)/vmlinux.relocs
+perkelex.bin.all-y := $(obj)/perkelex.bin
+perkelex.bin.all-$(CONFIG_X86_NEED_RELOCS) += $(obj)/perkelex.relocs
 
-$(obj)/vmlinux.bin.gz: $(vmlinux.bin.all-y) FORCE
+$(obj)/perkelex.bin.gz: $(perkelex.bin.all-y) FORCE
 	$(call if_changed,gzip)
-$(obj)/vmlinux.bin.bz2: $(vmlinux.bin.all-y) FORCE
+$(obj)/perkelex.bin.bz2: $(perkelex.bin.all-y) FORCE
 	$(call if_changed,bzip2_with_size)
-$(obj)/vmlinux.bin.lzma: $(vmlinux.bin.all-y) FORCE
+$(obj)/perkelex.bin.lzma: $(perkelex.bin.all-y) FORCE
 	$(call if_changed,lzma_with_size)
-$(obj)/vmlinux.bin.xz: $(vmlinux.bin.all-y) FORCE
+$(obj)/perkelex.bin.xz: $(perkelex.bin.all-y) FORCE
 	$(call if_changed,xzkern_with_size)
-$(obj)/vmlinux.bin.lzo: $(vmlinux.bin.all-y) FORCE
+$(obj)/perkelex.bin.lzo: $(perkelex.bin.all-y) FORCE
 	$(call if_changed,lzo_with_size)
-$(obj)/vmlinux.bin.lz4: $(vmlinux.bin.all-y) FORCE
+$(obj)/perkelex.bin.lz4: $(perkelex.bin.all-y) FORCE
 	$(call if_changed,lz4_with_size)
-$(obj)/vmlinux.bin.zst: $(vmlinux.bin.all-y) FORCE
+$(obj)/perkelex.bin.zst: $(perkelex.bin.all-y) FORCE
 	$(call if_changed,zstd22_with_size)
 
 suffix-$(CONFIG_KERNEL_GZIP)	:= gz
@@ -150,5 +150,5 @@ quiet_cmd_mkpiggy = MKPIGGY $@
       cmd_mkpiggy = $(obj)/mkpiggy $< > $@
 
 targets += piggy.S
-$(obj)/piggy.S: $(obj)/vmlinux.bin.$(suffix-y) $(obj)/mkpiggy FORCE
+$(obj)/piggy.S: $(obj)/perkelex.bin.$(suffix-y) $(obj)/mkpiggy FORCE
 	$(call if_changed,mkpiggy)

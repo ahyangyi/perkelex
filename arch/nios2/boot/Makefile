@@ -6,27 +6,27 @@
 # for more details.
 #
 
-UIMAGE_LOADADDR = $(shell $(NM) vmlinux | awk '$$NF == "_stext" {print $$1}')
-UIMAGE_ENTRYADDR = $(shell $(NM) vmlinux | awk '$$NF == "_start" {print $$1}')
+UIMAGE_LOADADDR = $(shell $(NM) perkelex | awk '$$NF == "_stext" {print $$1}')
+UIMAGE_ENTRYADDR = $(shell $(NM) perkelex | awk '$$NF == "_start" {print $$1}')
 UIMAGE_COMPRESSION = gzip
 
-OBJCOPYFLAGS_vmlinux.bin := -O binary
+OBJCOPYFLAGS_perkelex.bin := -O binary
 
-targets += vmlinux.bin vmlinux.gz vmImage
+targets += perkelex.bin perkelex.gz vmImage
 
-$(obj)/vmlinux.bin: vmlinux FORCE
+$(obj)/perkelex.bin: perkelex FORCE
 	$(call if_changed,objcopy)
 
-$(obj)/vmlinux.gz: $(obj)/vmlinux.bin FORCE
+$(obj)/perkelex.gz: $(obj)/perkelex.bin FORCE
 	$(call if_changed,gzip)
 
-$(obj)/vmImage: $(obj)/vmlinux.gz FORCE
+$(obj)/vmImage: $(obj)/perkelex.gz FORCE
 	$(call if_changed,uimage)
 	@$(kecho) 'Kernel: $@ is ready'
 
-$(obj)/zImage: $(obj)/compressed/vmlinux FORCE
+$(obj)/zImage: $(obj)/compressed/perkelex FORCE
 	$(call if_changed,objcopy)
 	@$(kecho) 'Kernel: $@ is ready'
 
-$(obj)/compressed/vmlinux: $(obj)/vmlinux.gz FORCE
+$(obj)/compressed/perkelex: $(obj)/perkelex.gz FORCE
 	$(Q)$(MAKE) $(build)=$(obj)/compressed $@

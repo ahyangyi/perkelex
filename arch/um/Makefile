@@ -18,7 +18,7 @@ else
 endif
 
 ARCH_DIR := arch/um
-# We require bash because the vmlinux link and loader script cpp use bash
+# We require bash because the perkelex link and loader script cpp use bash
 # features.
 SHELL := bash
 
@@ -97,14 +97,14 @@ PHONY += linux
 
 all: linux
 
-linux: vmlinux
+linux: perkelex
 	@echo '  LINK $@'
 	$(Q)ln -f $< $@
 
 define archhelp
   echo '* linux		- Binary kernel image (./linux) - for backward'
   echo '		   compatibility only, this creates a hard link to the'
-  echo '		   real kernel binary, the "vmlinux" binary you'
+  echo '		   real kernel binary, the "perkelex" binary you'
   echo '		   find in the kernel root.'
 endef
 
@@ -140,8 +140,8 @@ endif
 
 LD_FLAGS_CMDLINE = $(foreach opt,$(KBUILD_LDFLAGS) $(LDFLAGS_EXECSTACK),-Wl,$(opt))
 
-# Used by link-vmlinux.sh which has special support for um link
-export CFLAGS_vmlinux := $(LINK-y) $(LINK_WRAPS) $(LD_FLAGS_CMDLINE) $(CC_FLAGS_LTO)
+# Used by link-perkelex.sh which has special support for um link
+export CFLAGS_perkelex := $(LINK-y) $(LINK_WRAPS) $(LD_FLAGS_CMDLINE) $(CC_FLAGS_LTO)
 
 # When cleaning we don't include .config, so we don't include
 # TT or skas makefiles and don't clean skas_ptregs.h.

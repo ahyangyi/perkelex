@@ -128,7 +128,7 @@ else ifeq ($(ARCH),mips64)
 CHOST := mips64-linux-musl
 QEMU_ARCH := mips64
 KERNEL_ARCH := mips
-KERNEL_BZIMAGE := $(KERNEL_BUILD_PATH)/vmlinux
+KERNEL_BZIMAGE := $(KERNEL_BUILD_PATH)/perkelex
 ifeq ($(HOST_ARCH),$(ARCH))
 QEMU_MACHINE := -cpu host -machine malta,accel=kvm
 CFLAGS += -EB
@@ -140,7 +140,7 @@ else ifeq ($(ARCH),mips64el)
 CHOST := mips64el-linux-musl
 QEMU_ARCH := mips64el
 KERNEL_ARCH := mips
-KERNEL_BZIMAGE := $(KERNEL_BUILD_PATH)/vmlinux
+KERNEL_BZIMAGE := $(KERNEL_BUILD_PATH)/perkelex
 ifeq ($(HOST_ARCH),$(ARCH))
 QEMU_MACHINE := -cpu host -machine malta,accel=kvm
 CFLAGS += -EL
@@ -152,7 +152,7 @@ else ifeq ($(ARCH),mips)
 CHOST := mips-linux-musl
 QEMU_ARCH := mips
 KERNEL_ARCH := mips
-KERNEL_BZIMAGE := $(KERNEL_BUILD_PATH)/vmlinux
+KERNEL_BZIMAGE := $(KERNEL_BUILD_PATH)/perkelex
 ifeq ($(HOST_ARCH),$(ARCH))
 QEMU_MACHINE := -cpu host -machine malta,accel=kvm
 CFLAGS += -EB
@@ -164,7 +164,7 @@ else ifeq ($(ARCH),mipsel)
 CHOST := mipsel-linux-musl
 QEMU_ARCH := mipsel
 KERNEL_ARCH := mips
-KERNEL_BZIMAGE := $(KERNEL_BUILD_PATH)/vmlinux
+KERNEL_BZIMAGE := $(KERNEL_BUILD_PATH)/perkelex
 ifeq ($(HOST_ARCH),$(ARCH))
 QEMU_MACHINE := -cpu host -machine malta,accel=kvm
 CFLAGS += -EL
@@ -176,7 +176,7 @@ else ifeq ($(ARCH),powerpc64)
 CHOST := powerpc64-linux-musl
 QEMU_ARCH := ppc64
 KERNEL_ARCH := powerpc
-KERNEL_BZIMAGE := $(KERNEL_BUILD_PATH)/vmlinux
+KERNEL_BZIMAGE := $(KERNEL_BUILD_PATH)/perkelex
 ifeq ($(HOST_ARCH),$(ARCH))
 QEMU_MACHINE := -cpu host,accel=kvm -machine pseries
 else
@@ -186,7 +186,7 @@ else ifeq ($(ARCH),powerpc64le)
 CHOST := powerpc64le-linux-musl
 QEMU_ARCH := ppc64
 KERNEL_ARCH := powerpc
-KERNEL_BZIMAGE := $(KERNEL_BUILD_PATH)/vmlinux
+KERNEL_BZIMAGE := $(KERNEL_BUILD_PATH)/perkelex
 ifeq ($(HOST_ARCH),$(ARCH))
 QEMU_MACHINE := -cpu host,accel=kvm -machine pseries
 else
@@ -206,7 +206,7 @@ else ifeq ($(ARCH),m68k)
 CHOST := m68k-linux-musl
 QEMU_ARCH := m68k
 KERNEL_ARCH := m68k
-KERNEL_BZIMAGE := $(KERNEL_BUILD_PATH)/vmlinux
+KERNEL_BZIMAGE := $(KERNEL_BUILD_PATH)/perkelex
 KERNEL_CMDLINE := $(shell sed -n 's/CONFIG_CMDLINE=\(.*\)/\1/p' arch/m68k.config)
 QEMU_VPORT_RESULT := virtio-serial-device
 ifeq ($(HOST_ARCH),$(ARCH))
@@ -250,7 +250,7 @@ QEMU_MACHINE := -cpu max -machine s390-ccw-virtio -append $(KERNEL_CMDLINE)
 endif
 else ifeq ($(ARCH),um)
 CHOST := $(HOST_ARCH)-linux-musl
-KERNEL_BZIMAGE := $(KERNEL_BUILD_PATH)/vmlinux
+KERNEL_BZIMAGE := $(KERNEL_BUILD_PATH)/perkelex
 KERNEL_ARCH := um
 KERNEL_CMDLINE := $(shell sed -n 's/CONFIG_CMDLINE=\(.*\)/\1/p' arch/um.config)
 else

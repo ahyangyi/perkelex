@@ -26,4 +26,4 @@ ifdef CONFIG_ISA_ARCOMPACT
 CFLAGS_fpu.o   += -mdpfp
 endif
 
-extra-y := vmlinux.lds
+extra-y := perkelex.lds

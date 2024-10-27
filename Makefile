@@ -29,7 +29,7 @@ __all:
 # their own directory. If in some directory we have a dependency on
 # a file in another dir (which doesn't happen often, but it's often
 # unavoidable when linking the built-in.a targets which finally
-# turn into vmlinux), we will call a sub make in that other dir, and
+# turn into perkelex), we will call a sub make in that other dir, and
 # after that we are sure that everything which is in that other dir
 # is now up to date.
 #
@@ -522,7 +522,7 @@ LDFLAGS_MODULE  =
 CFLAGS_KERNEL	=
 RUSTFLAGS_KERNEL =
 AFLAGS_KERNEL	=
-LDFLAGS_vmlinux =
+LDFLAGS_perkelex =
 
 # Use USERINCLUDE when you must reference the UAPI directories only.
 USERINCLUDE    := \
@@ -680,7 +680,7 @@ config: outputmakefile scripts_basic FORCE
 
 else #!config-build
 # ===========================================================================
-# Build targets only - this includes vmlinux, arch-specific targets, clean
+# Build targets only - this includes perkelex, arch-specific targets, clean
 # targets and others. In general all targets except *config targets.
 
 # If building an external module we do not care about the all: rule
@@ -724,7 +724,7 @@ include include/config/auto.conf
 endif
 
 ifeq ($(KBUILD_EXTMOD),)
-# Objects we will link into vmlinux / subdirs we need to visit
+# Objects we will link into perkelex / subdirs we need to visit
 core-y		:=
 drivers-y	:=
 libs-y		:= lib/
@@ -733,8 +733,8 @@ endif # KBUILD_EXTMOD
 # The all: target is the default when no target is given on the
 # command line.
 # This allow a user to issue only 'make' to build a kernel including modules
-# Defaults to vmlinux, but the arch makefile usually adds further targets
-all: vmlinux
+# Defaults to perkelex, but the arch makefile usually adds further targets
+all: perkelex
 
 CFLAGS_GCOV	:= -fprofile-arcs -ftest-coverage
 ifdef CONFIG_CC_IS_GCC
@@ -919,7 +919,7 @@ endif
 ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
 KBUILD_CFLAGS_KERNEL += -ffunction-sections -fdata-sections
 KBUILD_RUSTFLAGS_KERNEL += -Zfunction-sections=y
-LDFLAGS_vmlinux += --gc-sections
+LDFLAGS_perkelex += --gc-sections
 endif
 
 ifdef CONFIG_SHADOW_CALL_STACK
@@ -1033,7 +1033,7 @@ KBUILD_CFLAGS   += $(KCFLAGS)
 KBUILD_RUSTFLAGS += $(KRUSTFLAGS)
 
 KBUILD_LDFLAGS_MODULE += --build-id=sha1
-LDFLAGS_vmlinux += --build-id=sha1
+LDFLAGS_perkelex += --build-id=sha1
 
 KBUILD_LDFLAGS	+= -z noexecstack
 ifeq ($(CONFIG_LD_IS_BFD),y)
@@ -1041,18 +1041,18 @@ KBUILD_LDFLAGS	+= $(call ld-option,--no-warn-rwx-segments)
 endif
 
 ifeq ($(CONFIG_STRIP_ASM_SYMS),y)
-LDFLAGS_vmlinux	+= -X
+LDFLAGS_perkelex	+= -X
 endif
 
 ifeq ($(CONFIG_RELR),y)
 # ld.lld before 15 did not support -z pack-relative-relocs.
-LDFLAGS_vmlinux	+= $(call ld-option,--pack-dyn-relocs=relr,-z pack-relative-relocs)
+LDFLAGS_perkelex	+= $(call ld-option,--pack-dyn-relocs=relr,-z pack-relative-relocs)
 endif
 
 # We never want expected sections to be placed heuristically by the
 # linker. All sections should be explicitly named in the linker script.
 ifdef CONFIG_LD_ORPHAN_WARN
-LDFLAGS_vmlinux += --orphan-handling=$(CONFIG_LD_ORPHAN_WARN_LEVEL)
+LDFLAGS_perkelex += --orphan-handling=$(CONFIG_LD_ORPHAN_WARN_LEVEL)
 endif
 
 # Align the bit size of userspace programs with the kernel
@@ -1073,7 +1073,7 @@ CHECKFLAGS += $(if $(CONFIG_64BIT),-m64,-m32)
 # set in the environment
 # Also any assignments in arch/$(ARCH)/Makefile take precedence over
 # this default value
-export KBUILD_IMAGE ?= vmlinux
+export KBUILD_IMAGE ?= perkelex
 
 #
 # INSTALL_PATH specifies where to place the updated kernel and system map
@@ -1112,7 +1112,7 @@ clean-dirs	:= $(sort . Documentation \
 export ARCH_CORE	:= $(core-y)
 export ARCH_LIB		:= $(filter %/, $(libs-y))
 export ARCH_DRIVERS	:= $(drivers-y) $(drivers-m)
-# Externally visible symbols (used by link-vmlinux.sh)
+# Externally visible symbols (used by link-perkelex.sh)
 
 KBUILD_VMLINUX_OBJS := ./built-in.a
 ifdef CONFIG_MODULES
@@ -1123,7 +1123,7 @@ KBUILD_VMLINUX_LIBS := $(patsubst %/,%/lib.a, $(libs-y))
 endif
 
 export KBUILD_VMLINUX_LIBS
-export KBUILD_LDS          := arch/$(SRCARCH)/kernel/vmlinux.lds
+export KBUILD_LDS          := arch/$(SRCARCH)/kernel/perkelex.lds
 
 ifdef CONFIG_TRIM_UNUSED_KSYMS
 # For the kernel to actually contain only the needed exported symbols,
@@ -1132,38 +1132,38 @@ KBUILD_MODULES := 1
 endif
 
 # '$(AR) mPi' needs 'T' to workaround the bug of llvm-ar <= 14
-quiet_cmd_ar_vmlinux.a = AR      $@
-      cmd_ar_vmlinux.a = \
+quiet_cmd_ar_perkelex.a = AR      $@
+      cmd_ar_perkelex.a = \
 	rm -f $@; \
 	$(AR) cDPrST $@ $(KBUILD_VMLINUX_OBJS); \
 	$(AR) mPiT $$($(AR) t $@ | sed -n 1p) $@ $$($(AR) t $@ | grep -F -f $(srctree)/scripts/head-object-list.txt)
 
-targets += vmlinux.a
-vmlinux.a: $(KBUILD_VMLINUX_OBJS) scripts/head-object-list.txt FORCE
-	$(call if_changed,ar_vmlinux.a)
+targets += perkelex.a
+perkelex.a: $(KBUILD_VMLINUX_OBJS) scripts/head-object-list.txt FORCE
+	$(call if_changed,ar_perkelex.a)
 
-PHONY += vmlinux_o
-vmlinux_o: vmlinux.a $(KBUILD_VMLINUX_LIBS)
-	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.vmlinux_o
+PHONY += perkelex_o
+perkelex_o: perkelex.a $(KBUILD_VMLINUX_LIBS)
+	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.perkelex_o
 
-vmlinux.o modules.builtin.modinfo modules.builtin: vmlinux_o
+perkelex.o modules.builtin.modinfo modules.builtin: perkelex_o
 	@:
 
-PHONY += vmlinux
-# LDFLAGS_vmlinux in the top Makefile defines linker flags for the top vmlinux,
-# not for decompressors. LDFLAGS_vmlinux in arch/*/boot/compressed/Makefile is
+PHONY += perkelex
+# LDFLAGS_perkelex in the top Makefile defines linker flags for the top perkelex,
+# not for decompressors. LDFLAGS_perkelex in arch/*/boot/compressed/Makefile is
 # unrelated; the decompressors just happen to have the same base name,
-# arch/*/boot/compressed/vmlinux.
-# Export LDFLAGS_vmlinux only to scripts/Makefile.vmlinux.
+# arch/*/boot/compressed/perkelex.
+# Export LDFLAGS_perkelex only to scripts/Makefile.perkelex.
 #
-# _LDFLAGS_vmlinux is a workaround for the 'private export' bug:
+# _LDFLAGS_perkelex is a workaround for the 'private export' bug:
 #   https://savannah.gnu.org/bugs/?61463
 # For Make > 4.4, the following simple code will work:
-#  vmlinux: private export LDFLAGS_vmlinux := $(LDFLAGS_vmlinux)
-vmlinux: private _LDFLAGS_vmlinux := $(LDFLAGS_vmlinux)
-vmlinux: export LDFLAGS_vmlinux = $(_LDFLAGS_vmlinux)
-vmlinux: vmlinux.o $(KBUILD_LDS) modpost
-	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.vmlinux
+#  perkelex: private export LDFLAGS_perkelex := $(LDFLAGS_perkelex)
+perkelex: private _LDFLAGS_perkelex := $(LDFLAGS_perkelex)
+perkelex: export LDFLAGS_perkelex = $(_LDFLAGS_perkelex)
+perkelex: perkelex.o $(KBUILD_LDS) modpost
+	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.perkelex
 
 # The actual objects are generated when descending,
 # make sure no implicit rule kicks in
@@ -1467,11 +1467,11 @@ endif
 # Build modules
 #
 
-# *.ko are usually independent of vmlinux, but CONFIG_DEBUG_INFO_BTF_MODULES
+# *.ko are usually independent of perkelex, but CONFIG_DEBUG_INFO_BTF_MODULES
 # is an exception.
 ifdef CONFIG_DEBUG_INFO_BTF_MODULES
 KBUILD_BUILTIN := 1
-modules: vmlinux
+modules: perkelex
 endif
 
 modules: modules_prepare
@@ -1490,11 +1490,11 @@ endif # CONFIG_MODULES
 # make distclean Remove editor backup files, patch leftover files and the like
 
 # Directories & files removed with 'make clean'
-CLEAN_FILES += vmlinux.symvers modules-only.symvers \
+CLEAN_FILES += perkelex.symvers modules-only.symvers \
 	       modules.builtin modules.builtin.modinfo modules.nsdeps \
-	       modules.builtin.ranges vmlinux.o.map \
+	       modules.builtin.ranges perkelex.o.map \
 	       compile_commands.json rust/test \
-	       rust-project.json .vmlinux.objs .vmlinux.export.c
+	       rust-project.json .perkelex.objs .perkelex.export.c
 
 # Directories & files removed with 'make mrproper'
 MRPROPER_FILES += include/config include/generated          \
@@ -1504,7 +1504,7 @@ MRPROPER_FILES += include/config include/generated          \
 		  Module.symvers \
 		  certs/signing_key.pem \
 		  certs/x509.genkey \
-		  vmlinux-gdb.py \
+		  perkelex-gdb.py \
 		  rpmbuild \
 		  rust/libmacros.so
 
@@ -1512,13 +1512,13 @@ MRPROPER_FILES += include/config include/generated          \
 #
 clean: private rm-files := $(CLEAN_FILES)
 
-PHONY += archclean vmlinuxclean
+PHONY += archclean perkelexclean
 
-vmlinuxclean:
-	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/link-vmlinux.sh clean
+perkelexclean:
+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/link-perkelex.sh clean
 	$(Q)$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) clean)
 
-clean: archclean vmlinuxclean resolve_btfids_clean
+clean: archclean perkelexclean resolve_btfids_clean
 
 # mrproper - Delete all generated files, including .config
 #
@@ -1576,7 +1576,7 @@ help:
 	@echo  ''
 	@echo  'Other generic targets:'
 	@echo  '  all		  - Build all targets marked with [*]'
-	@echo  '* vmlinux	  - Build the bare kernel'
+	@echo  '* perkelex	  - Build the bare kernel'
 	@echo  '* modules	  - Build all modules'
 	@echo  '  modules_install - Install all modules to INSTALL_MOD_PATH (default: /)'
 	@echo  '  vdso_install    - Install unstripped vdso to INSTALL_MOD_PATH (default: /)'
@@ -1772,7 +1772,7 @@ all: misc-check
 PHONY += scripts_gdb
 scripts_gdb: prepare0
 	$(Q)$(MAKE) $(build)=scripts/gdb
-	$(Q)ln -fsn $(abspath $(srctree)/scripts/gdb/vmlinux-gdb.py)
+	$(Q)ln -fsn $(abspath $(srctree)/scripts/gdb/perkelex-gdb.py)
 
 ifdef CONFIG_GDB_SCRIPTS
 all: scripts_gdb
@@ -1883,7 +1883,7 @@ KBUILD_MODULES :=
 endif # CONFIG_MODULES
 
 PHONY += modpost
-modpost: $(if $(single-build),, $(if $(KBUILD_BUILTIN), vmlinux.o)) \
+modpost: $(if $(single-build),, $(if $(KBUILD_BUILTIN), perkelex.o)) \
 	 $(if $(KBUILD_MODULES), modules_check)
 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
 
@@ -1992,7 +1992,7 @@ quiet_cmd_gen_compile_commands = GEN     $@
       cmd_gen_compile_commands = $(PYTHON3) $< -a $(AR) -o $@ $(filter-out $<, $(real-prereqs))
 
 $(extmod_prefix)compile_commands.json: $(srctree)/scripts/clang-tools/gen_compile_commands.py \
-	$(if $(KBUILD_EXTMOD),, vmlinux.a $(KBUILD_VMLINUX_LIBS)) \
+	$(if $(KBUILD_EXTMOD),, perkelex.a $(KBUILD_VMLINUX_LIBS)) \
 	$(if $(CONFIG_MODULES), $(MODORDER)) FORCE
 	$(call if_changed,gen_compile_commands)
 
@@ -2046,7 +2046,7 @@ CHECKSTACK_ARCH := $(ARCH)
 endif
 MINSTACKSIZE	?= 100
 checkstack:
-	$(OBJDUMP) -d vmlinux $$(find . -name '*.ko') | \
+	$(OBJDUMP) -d perkelex $$(find . -name '*.ko') | \
 	$(PERL) $(srctree)/scripts/checkstack.pl $(CHECKSTACK_ARCH) $(MINSTACKSIZE)
 
 kernelrelease:

@@ -251,9 +251,9 @@ endif
 KBUILD_LDFLAGS += -m elf_$(UTS_MACHINE)
 
 ifdef CONFIG_X86_NEED_RELOCS
-LDFLAGS_vmlinux := --emit-relocs --discard-none
+LDFLAGS_perkelex := --emit-relocs --discard-none
 else
-LDFLAGS_vmlinux :=
+LDFLAGS_perkelex :=
 endif
 
 #
@@ -262,7 +262,7 @@ endif
 # by the linker.
 #
 ifdef CONFIG_X86_64
-LDFLAGS_vmlinux += -z max-page-size=0x200000
+LDFLAGS_perkelex += -z max-page-size=0x200000
 endif
 
 
@@ -304,7 +304,7 @@ all: bzImage
 # KBUILD_IMAGE specify target image being built
 KBUILD_IMAGE := $(boot)/bzImage
 
-bzImage: vmlinux
+bzImage: perkelex
 ifeq ($(CONFIG_X86_DECODER_SELFTEST),y)
 	$(Q)$(MAKE) $(build)=arch/x86/tools posttest
 endif
@@ -312,7 +312,7 @@ endif
 	$(Q)mkdir -p $(objtree)/arch/$(UTS_MACHINE)/boot
 	$(Q)ln -fsn ../../x86/boot/bzImage $(objtree)/arch/$(UTS_MACHINE)/boot/$@
 
-$(BOOT_TARGETS): vmlinux
+$(BOOT_TARGETS): perkelex
 	$(Q)$(MAKE) $(build)=$(boot) $@
 
 PHONY += install

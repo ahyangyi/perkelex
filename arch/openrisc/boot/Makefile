@@ -3,8 +3,8 @@
 # Makefile for bootable kernel images
 #
 
-targets += vmlinux.bin
+targets += perkelex.bin
 
-OBJCOPYFLAGS_vmlinux.bin := -O binary
-$(obj)/vmlinux.bin: vmlinux FORCE
+OBJCOPYFLAGS_perkelex.bin := -O binary
+$(obj)/perkelex.bin: perkelex FORCE
 	$(call if_changed,objcopy)

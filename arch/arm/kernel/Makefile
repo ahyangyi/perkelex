@@ -3,7 +3,7 @@
 # Makefile for the linux kernel.
 #
 
-CPPFLAGS_vmlinux.lds := -DTEXT_OFFSET=$(TEXT_OFFSET)
+CPPFLAGS_perkelex.lds := -DTEXT_OFFSET=$(TEXT_OFFSET)
 AFLAGS_head.o        := -DTEXT_OFFSET=$(TEXT_OFFSET)
 
 ifdef CONFIG_FUNCTION_TRACER
@@ -103,4 +103,4 @@ obj-$(CONFIG_HAVE_ARM_SMCCC)	+= smccc-call.o
 
 obj-$(CONFIG_GENERIC_CPU_VULNERABILITIES) += spectre.o
 
-extra-y := vmlinux.lds
+extra-y := perkelex.lds

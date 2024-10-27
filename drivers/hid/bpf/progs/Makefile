@@ -21,14 +21,14 @@ BPFOBJ := $(LIBBPF_OUTPUT)/libbpf.a
 INCLUDES := -I$(OUTPUT) -I$(LIBBPF_INCLUDE) -I$(TOOLS_PATH)/include/uapi
 CFLAGS := -g -Wall
 
-VMLINUX_BTF_PATHS ?= $(if $(O),$(O)/vmlinux)				\
-		     $(if $(KBUILD_OUTPUT),$(KBUILD_OUTPUT)/vmlinux)	\
-		     ../../../../vmlinux				\
-		     /sys/kernel/btf/vmlinux				\
-		     /boot/vmlinux-$(shell uname -r)
+VMLINUX_BTF_PATHS ?= $(if $(O),$(O)/perkelex)				\
+		     $(if $(KBUILD_OUTPUT),$(KBUILD_OUTPUT)/perkelex)	\
+		     ../../../../perkelex				\
+		     /sys/kernel/btf/perkelex				\
+		     /boot/perkelex-$(shell uname -r)
 VMLINUX_BTF ?= $(abspath $(firstword $(wildcard $(VMLINUX_BTF_PATHS))))
 ifeq ($(VMLINUX_BTF),)
-$(error Cannot find a vmlinux for VMLINUX_BTF at any of "$(VMLINUX_BTF_PATHS)")
+$(error Cannot find a perkelex for VMLINUX_BTF at any of "$(VMLINUX_BTF_PATHS)")
 endif
 
 ifeq ($(V),1)
@@ -54,13 +54,13 @@ clean:
 	$(call msg,CLEAN)
 	$(Q)rm -rf $(OUTPUT) $(TARGETS)
 
-%.bpf.o: %.bpf.c vmlinux.h $(BPFOBJ) | $(OUTPUT)
+%.bpf.o: %.bpf.c perkelex.h $(BPFOBJ) | $(OUTPUT)
 	$(call msg,BPF,$@)
 	$(Q)$(CLANG) -g -O2 --target=bpf -Wall -Werror $(INCLUDES)	      \
 		 -c $(filter %.c,$^) -o $@ &&				      \
 	$(LLVM_STRIP) -g $@
 
-vmlinux.h: $(VMLINUX_BTF) $(BPFTOOL) | $(INCLUDE_DIR)
+perkelex.h: $(VMLINUX_BTF) $(BPFTOOL) | $(INCLUDE_DIR)
 ifeq ($(VMLINUX_H),)
 	$(call msg,GEN,,$@)
 	$(Q)$(BPFTOOL) btf dump file $(VMLINUX_BTF) format c > $@

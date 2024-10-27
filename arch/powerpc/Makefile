@@ -107,10 +107,10 @@ else
 cflags-$(CONFIG_STACKPROTECTOR)	+= -mstack-protector-guard-reg=r2
 endif
 
-LDFLAGS_vmlinux-y := -Bstatic
-LDFLAGS_vmlinux-$(CONFIG_RELOCATABLE) := -pie
-LDFLAGS_vmlinux-$(CONFIG_RELOCATABLE) += -z notext
-LDFLAGS_vmlinux	:= $(LDFLAGS_vmlinux-y)
+LDFLAGS_perkelex-y := -Bstatic
+LDFLAGS_perkelex-$(CONFIG_RELOCATABLE) := -pie
+LDFLAGS_perkelex-$(CONFIG_RELOCATABLE) += -z notext
+LDFLAGS_perkelex	:= $(LDFLAGS_perkelex-y)
 
 ifdef CONFIG_PPC64
 ifndef CONFIG_PPC_KERNEL_PCREL
@@ -232,9 +232,9 @@ PHONY += $(BOOT_TARGETS1) $(BOOT_TARGETS2)
 
 boot := arch/powerpc/boot
 
-$(BOOT_TARGETS1): vmlinux
+$(BOOT_TARGETS1): perkelex
 	$(Q)$(MAKE) $(build)=$(boot) $(patsubst %,$(boot)/%,$@)
-$(BOOT_TARGETS2): vmlinux
+$(BOOT_TARGETS2): perkelex
 	$(Q)$(MAKE) $(build)=$(boot) $(patsubst %,$(boot)/%,$@)
 
 

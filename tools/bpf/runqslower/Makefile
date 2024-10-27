@@ -19,10 +19,10 @@ LDLIBS += -lelf -lz
 
 # Try to detect best kernel BTF source
 KERNEL_REL := $(shell uname -r)
-VMLINUX_BTF_PATHS := $(if $(O),$(O)/vmlinux)		\
-	$(if $(KBUILD_OUTPUT),$(KBUILD_OUTPUT)/vmlinux) \
-	../../../vmlinux /sys/kernel/btf/vmlinux	\
-	/boot/vmlinux-$(KERNEL_REL)
+VMLINUX_BTF_PATHS := $(if $(O),$(O)/perkelex)		\
+	$(if $(KBUILD_OUTPUT),$(KBUILD_OUTPUT)/perkelex) \
+	../../../perkelex /sys/kernel/btf/perkelex	\
+	/boot/perkelex-$(KERNEL_REL)
 VMLINUX_BTF_PATH := $(or $(VMLINUX_BTF),$(firstword			       \
 					  $(wildcard $(VMLINUX_BTF_PATHS))))
 
@@ -45,7 +45,7 @@ clean:
 	$(call QUIET_CLEAN, runqslower)
 	$(Q)$(RM) -r $(BPFOBJ_OUTPUT) $(BPFTOOL_OUTPUT)
 	$(Q)$(RM) $(OUTPUT)*.o $(OUTPUT)*.d
-	$(Q)$(RM) $(OUTPUT)*.skel.h $(OUTPUT)vmlinux.h
+	$(Q)$(RM) $(OUTPUT)*.skel.h $(OUTPUT)perkelex.h
 	$(Q)$(RM) $(OUTPUT)runqslower
 	$(Q)$(RM) -r .output
 
@@ -57,7 +57,7 @@ $(OUTPUT)/runqslower: $(OUTPUT)/runqslower.o $(BPFOBJ)
 $(OUTPUT)/runqslower.o: runqslower.h $(OUTPUT)/runqslower.skel.h	      \
 			$(OUTPUT)/runqslower.bpf.o | libbpf_hdrs
 
-$(OUTPUT)/runqslower.bpf.o: $(OUTPUT)/vmlinux.h runqslower.h | libbpf_hdrs
+$(OUTPUT)/runqslower.bpf.o: $(OUTPUT)/perkelex.h runqslower.h | libbpf_hdrs
 
 $(OUTPUT)/%.skel.h: $(OUTPUT)/%.bpf.o | $(BPFTOOL)
 	$(QUIET_GEN)$(BPFTOOL) gen skeleton $< > $@
@@ -73,7 +73,7 @@ $(OUTPUT)/%.o: %.c | $(OUTPUT)
 $(OUTPUT) $(BPFOBJ_OUTPUT) $(BPFTOOL_OUTPUT):
 	$(QUIET_MKDIR)mkdir -p $@
 
-$(OUTPUT)/vmlinux.h: $(VMLINUX_BTF_PATH) | $(OUTPUT) $(BPFTOOL)
+$(OUTPUT)/perkelex.h: $(VMLINUX_BTF_PATH) | $(OUTPUT) $(BPFTOOL)
 ifeq ($(VMLINUX_H),)
 	$(Q)if [ ! -e "$(VMLINUX_BTF_PATH)" ] ; then \
 		echo "Couldn't find kernel BTF; set VMLINUX_BTF to"	       \

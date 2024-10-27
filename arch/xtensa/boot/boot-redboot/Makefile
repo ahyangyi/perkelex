@@ -12,7 +12,7 @@ targets	+= $(boot-y)
 OBJS	:= $(addprefix $(obj)/,$(boot-y))
 LIBS	:= arch/xtensa/boot/lib/lib.a arch/xtensa/lib/lib.a
 
-$(obj)/zImage.o: $(obj)/../vmlinux.bin.gz $(OBJS)
+$(obj)/zImage.o: $(obj)/../perkelex.bin.gz $(OBJS)
 	$(Q)$(OBJCOPY) $(OBJCOPY_ARGS) -R .comment \
 		--add-section image=$< \
 		--set-section-flags image=contents,alloc,load,load,data \

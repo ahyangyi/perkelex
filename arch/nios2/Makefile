@@ -47,7 +47,7 @@ KBUILD_IMAGE := $(nios2-boot)/vmImage
 
 all: vmImage
 
-$(BOOT_TARGETS): vmlinux
+$(BOOT_TARGETS): perkelex
 	$(Q)$(MAKE) $(build)=$(nios2-boot) $(nios2-boot)/$@
 
 install:

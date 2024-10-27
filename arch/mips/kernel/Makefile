@@ -3,7 +3,7 @@
 # Makefile for the Linux/MIPS kernel.
 #
 
-extra-y		:= vmlinux.lds
+extra-y		:= perkelex.lds
 
 obj-y		+= head.o branch.o cmpxchg.o elf.o entry.o genex.o idle.o irq.o \
 		   process.o prom.o ptrace.o reset.o setup.o signal.o \
@@ -111,4 +111,4 @@ obj-$(CONFIG_MIPS_CPC)		+= mips-cpc.o
 obj-$(CONFIG_CPU_PM)		+= pm.o
 obj-$(CONFIG_MIPS_CPS_PM)	+= pm-cps.o
 
-CPPFLAGS_vmlinux.lds		:= $(KBUILD_CFLAGS)
+CPPFLAGS_perkelex.lds		:= $(KBUILD_CFLAGS)

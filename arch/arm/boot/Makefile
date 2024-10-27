@@ -35,7 +35,7 @@ quiet_cmd_mkxip = $(quiet_cmd_objcopy)
 cmd_mkxip = $(cmd_objcopy)
 endif
 
-$(obj)/xipImage: vmlinux FORCE
+$(obj)/xipImage: perkelex FORCE
 	$(call if_changed,mkxip)
 	@$(kecho) '  Physical Address of xipImage: $(CONFIG_XIP_PHYS_ADDR)'
 
@@ -50,13 +50,13 @@ $(obj)/xipImage: FORCE
 	@echo 'Kernel not configured for XIP (CONFIG_XIP_KERNEL!=y)'
 	@false
 
-$(obj)/Image: vmlinux FORCE
+$(obj)/Image: perkelex FORCE
 	$(call if_changed,objcopy)
 
-$(obj)/compressed/vmlinux: $(obj)/Image FORCE
+$(obj)/compressed/perkelex: $(obj)/Image FORCE
 	$(Q)$(MAKE) $(build)=$(obj)/compressed $@
 
-$(obj)/zImage:	$(obj)/compressed/vmlinux FORCE
+$(obj)/zImage:	$(obj)/compressed/perkelex FORCE
 	$(call if_changed,objcopy)
 
 endif

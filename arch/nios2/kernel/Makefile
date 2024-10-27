@@ -3,7 +3,7 @@
 # Makefile for the nios2 linux kernel.
 #
 
-extra-y	+= vmlinux.lds
+extra-y	+= perkelex.lds
 
 obj-y	+= head.o
 obj-y	+= cpuinfo.o

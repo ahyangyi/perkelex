@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0-only
-extra-y := vmlinux.lds
+extra-y := perkelex.lds
 
 obj-y += head.o entry.o atomic.o signal.o traps.o irq.o time.o vdso.o vdso/
 obj-y += power.o syscall.o syscall_table.o setup.o io.o

@@ -97,7 +97,7 @@ boot		:= arch/arc/boot
 boot_targets := uImage.bin uImage.gz uImage.lzma
 
 PHONY += $(boot_targets)
-$(boot_targets): vmlinux
+$(boot_targets): perkelex
 	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
 
 uimage-default-y			:= uImage.bin

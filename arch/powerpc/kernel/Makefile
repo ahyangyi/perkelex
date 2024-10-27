@@ -126,7 +126,7 @@ obj-$(CONFIG_PPC_BOOK3S_32)	+= head_book3s_32.o
 obj-$(CONFIG_44x)		+= head_44x.o
 obj-$(CONFIG_PPC_8xx)		+= head_8xx.o
 obj-$(CONFIG_PPC_85xx)		+= head_85xx.o
-extra-y				+= vmlinux.lds
+extra-y				+= perkelex.lds
 
 obj-$(CONFIG_RELOCATABLE)	+= reloc_$(BITS).o
 
@@ -215,7 +215,7 @@ $(obj)/prom_init_check: $(src)/prom_init_check.sh $(obj)/prom_init.o FORCE
 	$(call if_changed,prom_init_check)
 targets += prom_init_check
 
-clean-files := vmlinux.lds
+clean-files := perkelex.lds
 
 # Force dependency (incbin is bad)
 $(obj)/vdso32_wrapper.o : $(obj)/vdso/vdso32.so.dbg

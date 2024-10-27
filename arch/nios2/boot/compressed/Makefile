@@ -1,19 +1,19 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# create a compressed vmlinux image from the original vmlinux
+# create a compressed perkelex image from the original perkelex
 #
 
-targets		:= vmlinux head.o misc.o piggy.o vmlinux.lds
+targets		:= perkelex head.o misc.o piggy.o perkelex.lds
 asflags-y	:=
 
 OBJECTS = $(obj)/head.o $(obj)/misc.o
 
-LDFLAGS_vmlinux := -T
+LDFLAGS_perkelex := -T
 
-$(obj)/vmlinux: $(obj)/vmlinux.lds $(OBJECTS) $(obj)/piggy.o FORCE
+$(obj)/perkelex: $(obj)/perkelex.lds $(OBJECTS) $(obj)/piggy.o FORCE
 	$(call if_changed,ld)
 
 LDFLAGS_piggy.o := -r --format binary --oformat elf32-littlenios2 -T
 
-$(obj)/piggy.o: $(obj)/vmlinux.scr $(obj)/../vmlinux.gz FORCE
+$(obj)/piggy.o: $(obj)/perkelex.scr $(obj)/../perkelex.gz FORCE
 	$(call if_changed,ld)

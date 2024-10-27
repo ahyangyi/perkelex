@@ -161,15 +161,15 @@ $(obj)/hid_surface_dial.o: $(obj)/hid_surface_dial.skel.h
 
 -include $(HID_SAMPLES_PATH)/Makefile.target
 
-VMLINUX_BTF_PATHS ?= $(abspath $(if $(O),$(O)/vmlinux))				\
-		     $(abspath $(if $(KBUILD_OUTPUT),$(KBUILD_OUTPUT)/vmlinux))	\
-		     $(abspath ./vmlinux)
+VMLINUX_BTF_PATHS ?= $(abspath $(if $(O),$(O)/perkelex))				\
+		     $(abspath $(if $(KBUILD_OUTPUT),$(KBUILD_OUTPUT)/perkelex))	\
+		     $(abspath ./perkelex)
 VMLINUX_BTF ?= $(abspath $(firstword $(wildcard $(VMLINUX_BTF_PATHS))))
 
-$(obj)/vmlinux.h: $(VMLINUX_BTF) $(BPFTOOL)
+$(obj)/perkelex.h: $(VMLINUX_BTF) $(BPFTOOL)
 ifeq ($(VMLINUX_H),)
 ifeq ($(VMLINUX_BTF),)
-	$(error Cannot find a vmlinux for VMLINUX_BTF at any of "$(VMLINUX_BTF_PATHS)",\
+	$(error Cannot find a perkelex for VMLINUX_BTF at any of "$(VMLINUX_BTF_PATHS)",\
 		build the kernel or set VMLINUX_BTF or VMLINUX_H variable)
 endif
 	$(Q)$(BPFTOOL) btf dump file $(VMLINUX_BTF) format c > $@
@@ -177,7 +177,7 @@ else
 	$(Q)cp "$(VMLINUX_H)" $@
 endif
 
-clean-files += vmlinux.h
+clean-files += perkelex.h
 
 # Get Clang's default includes on this system, as opposed to those seen by
 # '--target=bpf'. This fixes "missing" files on some architectures/distros,
@@ -195,7 +195,7 @@ CLANG_SYS_INCLUDES = $(call get_sys_includes,$(CLANG))
 
 EXTRA_BPF_HEADERS_SRC := $(addprefix $(src)/,$(EXTRA_BPF_HEADERS))
 
-$(obj)/%.bpf.o: $(src)/%.bpf.c $(EXTRA_BPF_HEADERS_SRC) $(obj)/vmlinux.h
+$(obj)/%.bpf.o: $(src)/%.bpf.c $(EXTRA_BPF_HEADERS_SRC) $(obj)/perkelex.h
 	@echo "  CLANG-BPF " $@
 	$(Q)$(CLANG) -g -O2 --target=bpf -D__TARGET_ARCH_$(SRCARCH) \
 		-Wno-compare-distinct-pointer-types -I$(srctree)/include \

@@ -19,7 +19,7 @@ OBJCOPYFLAGS_Image :=-O binary -R .note -R .note.gnu.build-id -R .comment -S
 targets := Image Image.bz2 Image.gz Image.lz4 Image.lzma Image.lzo \
 	Image.zst Image.xz image.fit
 
-$(obj)/Image: vmlinux FORCE
+$(obj)/Image: perkelex FORCE
 	$(call if_changed,objcopy)
 
 $(obj)/Image.bz2: $(obj)/Image FORCE
@@ -52,6 +52,6 @@ EFI_ZBOOT_MACH_TYPE	:= ARM64
 EFI_ZBOOT_FORWARD_CFI	:= $(CONFIG_ARM64_BTI_KERNEL)
 
 EFI_ZBOOT_OBJCOPY_FLAGS	= --add-symbol zboot_code_size=0x$$( \
-				$(NM) vmlinux|grep _kernel_codesize|cut -d' ' -f1)
+				$(NM) perkelex|grep _kernel_codesize|cut -d' ' -f1)
 
 include $(srctree)/drivers/firmware/efi/libstub/Makefile.zboot

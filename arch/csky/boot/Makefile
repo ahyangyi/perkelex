@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 targets := Image zImage uImage
 
-$(obj)/Image: vmlinux FORCE
+$(obj)/Image: perkelex FORCE
 	$(call if_changed,objcopy)
 	@echo '  Kernel: $@ is ready'
 
@@ -17,7 +17,7 @@ $(obj)/zImage:  $(obj)/Image FORCE
 
 UIMAGE_ARCH		= sandbox
 UIMAGE_COMPRESSION	= $(compress-y)
-UIMAGE_LOADADDR		= $(shell $(NM) vmlinux | awk '$$NF == "_start" {print $$1}')
+UIMAGE_LOADADDR		= $(shell $(NM) perkelex | awk '$$NF == "_start" {print $$1}')
 
 $(obj)/uImage: $(obj)/zImage
 	$(call if_changed,uimage)

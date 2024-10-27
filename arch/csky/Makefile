@@ -68,7 +68,7 @@ boot := arch/csky/boot
 
 all: zImage
 
-zImage Image uImage: vmlinux
+zImage Image uImage: perkelex
 	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
 
 define archhelp

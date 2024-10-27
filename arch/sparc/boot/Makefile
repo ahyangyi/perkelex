@@ -8,7 +8,7 @@ ROOT_IMG	:= /usr/src/root.img
 ELFTOAOUT	:= elftoaout
 
 hostprogs	:= piggyback
-targets		:= tftpboot.img image zImage vmlinux.aout
+targets		:= tftpboot.img image zImage perkelex.aout
 clean-files	:= System.map
 
 quiet_cmd_elftoaout	= ELFTOAOUT $@
@@ -26,7 +26,7 @@ $(obj)/zImage: $(obj)/image FORCE
 	$(call if_changed,gzip)
 	@$(kecho) 'Kernel: $@ is ready' '(#'$(or $(KBUILD_BUILD_VERSION),`cat .version`)')'
 
-$(obj)/vmlinux.aout: vmlinux FORCE
+$(obj)/perkelex.aout: perkelex FORCE
 	$(call if_changed,elftoaout)
 	@$(kecho) 'Kernel: $@ is ready' '(#'$(or $(KBUILD_BUILD_VERSION),`cat .version`)')'
 else
@@ -63,7 +63,7 @@ $(obj)/uImage: $(obj)/image.gz FORCE
 
 endif
 
-$(obj)/image: vmlinux FORCE
+$(obj)/image: perkelex FORCE
 	$(call if_changed,strip)
 	@$(kecho) 'Kernel: $@ is ready' '(#'$(or $(KBUILD_BUILD_VERSION),`cat .version`)')'
 

@@ -190,11 +190,11 @@ $(BOOTSTRAP_OBJS): $(LIBBPF_BOOTSTRAP)
 OBJS = $(patsubst %.c,$(OUTPUT)%.o,$(SRCS)) $(OUTPUT)disasm.o
 $(OBJS): $(LIBBPF) $(LIBBPF_INTERNAL_HDRS)
 
-VMLINUX_BTF_PATHS ?= $(if $(O),$(O)/vmlinux)				\
-		     $(if $(KBUILD_OUTPUT),$(KBUILD_OUTPUT)/vmlinux)	\
-		     ../../../vmlinux					\
-		     /sys/kernel/btf/vmlinux				\
-		     /boot/vmlinux-$(shell uname -r)
+VMLINUX_BTF_PATHS ?= $(if $(O),$(O)/perkelex)				\
+		     $(if $(KBUILD_OUTPUT),$(KBUILD_OUTPUT)/perkelex)	\
+		     ../../../perkelex					\
+		     /sys/kernel/btf/perkelex				\
+		     /boot/perkelex-$(shell uname -r)
 VMLINUX_BTF ?= $(abspath $(firstword $(wildcard $(VMLINUX_BTF_PATHS))))
 
 bootstrap: $(BPFTOOL_BOOTSTRAP)
@@ -205,14 +205,14 @@ ifeq ($(feature-clang-bpf-co-re),1)
 BUILD_BPF_SKELS := 1
 
 ifeq ($(VMLINUX_H),)
-$(OUTPUT)vmlinux.h: $(VMLINUX_BTF) $(BPFTOOL_BOOTSTRAP)
+$(OUTPUT)perkelex.h: $(VMLINUX_BTF) $(BPFTOOL_BOOTSTRAP)
 	$(QUIET_GEN)$(BPFTOOL_BOOTSTRAP) btf dump file $< format c > $@
 else
-$(OUTPUT)vmlinux.h: $(VMLINUX_H)
+$(OUTPUT)perkelex.h: $(VMLINUX_H)
 	$(Q)cp "$(VMLINUX_H)" $@
 endif
 
-$(OUTPUT)%.bpf.o: skeleton/%.bpf.c $(OUTPUT)vmlinux.h $(LIBBPF_BOOTSTRAP)
+$(OUTPUT)%.bpf.o: skeleton/%.bpf.c $(OUTPUT)perkelex.h $(LIBBPF_BOOTSTRAP)
 	$(QUIET_CLANG)$(CLANG) \
 		-I$(or $(OUTPUT),.) \
 		-I$(srctree)/tools/include/uapi/ \
@@ -255,7 +255,7 @@ feature-detect-clean:
 clean: $(LIBBPF)-clean $(LIBBPF_BOOTSTRAP)-clean feature-detect-clean
 	$(call QUIET_CLEAN, bpftool)
 	$(Q)$(RM) -- $(OUTPUT)bpftool $(OUTPUT)*.o $(OUTPUT)*.d
-	$(Q)$(RM) -- $(OUTPUT)*.skel.h $(OUTPUT)vmlinux.h
+	$(Q)$(RM) -- $(OUTPUT)*.skel.h $(OUTPUT)perkelex.h
 	$(Q)$(RM) -r -- $(LIBBPF_OUTPUT) $(BOOTSTRAP_OUTPUT)
 	$(call QUIET_CLEAN, core-gen)
 	$(Q)$(RM) -- $(OUTPUT)FEATURE-DUMP.bpftool

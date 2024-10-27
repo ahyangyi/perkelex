@@ -23,7 +23,7 @@ LIBGCC 		:= $(shell $(CC) $(KBUILD_CFLAGS) -print-libgcc-file-name)
 KBUILD_CFLAGS	+= -pipe -ffixed-r10 -D__linux__
 KBUILD_CFLAGS	+= -msfimm -mshftimm
 
-all: vmlinux.bin
+all: perkelex.bin
 
 boot := arch/$(ARCH)/boot
 
@@ -57,7 +57,7 @@ endif
 
 libs-y		+= $(LIBGCC)
 
-PHONY += vmlinux.bin
+PHONY += perkelex.bin
 
-vmlinux.bin: vmlinux
+perkelex.bin: perkelex
 	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@

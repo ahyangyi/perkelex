@@ -67,7 +67,7 @@ boot := arch/sparc/boot
 # Default target
 all: zImage
 
-image zImage uImage tftpboot.img vmlinux.aout: vmlinux
+image zImage uImage tftpboot.img perkelex.aout: perkelex
 	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
 
 install:
@@ -84,10 +84,10 @@ KBUILD_IMAGE := $(boot)/zImage
 
 # Don't use tabs in echo arguments.
 define archhelp
-  echo  '* vmlinux      - standard SPARC kernel'
+  echo  '* perkelex      - standard SPARC kernel'
   echo  '  image        - kernel image ($(boot)/image)'
   echo  '* zImage       - stripped/compressed kernel image ($(boot)/zImage)'
   echo  '  uImage       - U-Boot SPARC32 Image (only for LEON)'
-  echo  '  vmlinux.aout - a.out kernel for SPARC64'
+  echo  '  perkelex.aout - a.out kernel for SPARC64'
   echo  '  tftpboot.img - image prepared for tftp'
 endef

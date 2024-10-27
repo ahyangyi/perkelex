@@ -3,7 +3,7 @@
 # Makefile for the linux kernel.
 #
 
-extra-y			+= vmlinux.lds
+extra-y			+= perkelex.lds
 
 obj-$(CONFIG_AMIGA)	:= head.o
 obj-$(CONFIG_ATARI)	:= head.o

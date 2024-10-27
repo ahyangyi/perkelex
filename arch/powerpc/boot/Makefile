@@ -272,7 +272,7 @@ compressor-$(CONFIG_KERNEL_LZO) := lzo
 quiet_cmd_wrap	= WRAP    $@
       cmd_wrap	=$(CONFIG_SHELL) $(wrapper) -Z $(compressor-y) -c -o $@ -p $2 \
 		$(CROSSWRAP) $(if $3, -s $3)$(if $4, -d $4)$(if $5, -i $5) \
-		vmlinux
+		perkelex
 
 image-$(CONFIG_PPC_PSERIES)		+= zImage.pseries
 image-$(CONFIG_PPC_POWERNV)		+= zImage.pseries
@@ -381,58 +381,58 @@ $(addprefix $(obj)/, $(initrd-y)): $(obj)/ramdisk.image.gz
 # Don't put the ramdisk on the pattern rule; when its missing make will try
 # the pattern rule with less dependencies that also matches (even with the
 # hard dependency listed).
-$(obj)/zImage.initrd.%: vmlinux $(wrapperbits) FORCE
+$(obj)/zImage.initrd.%: perkelex $(wrapperbits) FORCE
 	$(call if_changed,wrap,$*,,,$(obj)/ramdisk.image.gz)
 
-$(addprefix $(obj)/, $(sort $(filter zImage.%, $(image-y)))): vmlinux $(wrapperbits) FORCE
+$(addprefix $(obj)/, $(sort $(filter zImage.%, $(image-y)))): perkelex $(wrapperbits) FORCE
 	$(call if_changed,wrap,$(subst $(obj)/zImage.,,$@))
 
 # dtbImage% - a dtbImage is a zImage with an embedded device tree blob
-$(obj)/dtbImage.initrd.%: vmlinux $(wrapperbits) $(obj)/dts/%.dtb FORCE
+$(obj)/dtbImage.initrd.%: perkelex $(wrapperbits) $(obj)/dts/%.dtb FORCE
 	$(call if_changed,wrap,$*,,$(obj)/dts/$*.dtb,$(obj)/ramdisk.image.gz)
 
-$(obj)/dtbImage.%: vmlinux $(wrapperbits) $(obj)/dts/%.dtb FORCE
+$(obj)/dtbImage.%: perkelex $(wrapperbits) $(obj)/dts/%.dtb FORCE
 	$(call if_changed,wrap,$*,,$(obj)/dts/$*.dtb)
 
 # This cannot be in the root of $(src) as the zImage rule always adds a $(obj)
 # prefix
-$(obj)/vmlinux.strip: vmlinux
+$(obj)/perkelex.strip: perkelex
 	$(STRIP) -s -R .comment $< -o $@
 
-$(obj)/uImage: vmlinux $(wrapperbits) FORCE
+$(obj)/uImage: perkelex $(wrapperbits) FORCE
 	$(call if_changed,wrap,uboot)
 
-$(obj)/uImage.initrd.%: vmlinux $(obj)/dts/%.dtb $(wrapperbits) FORCE
+$(obj)/uImage.initrd.%: perkelex $(obj)/dts/%.dtb $(wrapperbits) FORCE
 	$(call if_changed,wrap,uboot-$*,,$(obj)/dts/$*.dtb,$(obj)/ramdisk.image.gz)
 
-$(obj)/uImage.%: vmlinux $(obj)/dts/%.dtb $(wrapperbits) FORCE
+$(obj)/uImage.%: perkelex $(obj)/dts/%.dtb $(wrapperbits) FORCE
 	$(call if_changed,wrap,uboot-$*,,$(obj)/dts/$*.dtb)
 
-$(obj)/cuImage.initrd.%: vmlinux $(obj)/dts/%.dtb $(wrapperbits) FORCE
+$(obj)/cuImage.initrd.%: perkelex $(obj)/dts/%.dtb $(wrapperbits) FORCE
 	$(call if_changed,wrap,cuboot-$*,,$(obj)/dts/$*.dtb,$(obj)/ramdisk.image.gz)
 
-$(obj)/cuImage.%: vmlinux $(obj)/dts/%.dtb $(wrapperbits) FORCE
+$(obj)/cuImage.%: perkelex $(obj)/dts/%.dtb $(wrapperbits) FORCE
 	$(call if_changed,wrap,cuboot-$*,,$(obj)/dts/$*.dtb)
 
-$(obj)/simpleImage.initrd.%: vmlinux $(obj)/dts/%.dtb $(wrapperbits) FORCE
+$(obj)/simpleImage.initrd.%: perkelex $(obj)/dts/%.dtb $(wrapperbits) FORCE
 	$(call if_changed,wrap,simpleboot-$*,,$(obj)/dts/$*.dtb,$(obj)/ramdisk.image.gz)
 
-$(obj)/simpleImage.%: vmlinux $(obj)/dts/%.dtb $(wrapperbits) FORCE
+$(obj)/simpleImage.%: perkelex $(obj)/dts/%.dtb $(wrapperbits) FORCE
 	$(call if_changed,wrap,simpleboot-$*,,$(obj)/dts/$*.dtb)
 
-$(obj)/treeImage.initrd.%: vmlinux $(obj)/dts/%.dtb $(wrapperbits) FORCE
+$(obj)/treeImage.initrd.%: perkelex $(obj)/dts/%.dtb $(wrapperbits) FORCE
 	$(call if_changed,wrap,treeboot-$*,,$(obj)/dts/$*.dtb,$(obj)/ramdisk.image.gz)
 
-$(obj)/treeImage.%: vmlinux $(obj)/dts/%.dtb $(wrapperbits) FORCE
+$(obj)/treeImage.%: perkelex $(obj)/dts/%.dtb $(wrapperbits) FORCE
 	$(call if_changed,wrap,treeboot-$*,,$(obj)/dts/$*.dtb)
 
 # Needed for the above targets to work with dts/fsl/ files
 $(obj)/dts/%.dtb: $(obj)/dts/fsl/%.dtb
 	@cp $< $@
 
-# If there isn't a platform selected then just strip the vmlinux.
+# If there isn't a platform selected then just strip the perkelex.
 ifeq (,$(image-y))
-image-y := vmlinux.strip
+image-y := perkelex.strip
 endif
 
 $(obj)/zImage:		$(addprefix $(obj)/, $(image-y))
@@ -447,7 +447,7 @@ clean-files += $(image-) $(initrd-) cuImage.* dtbImage.* treeImage.* \
 	zImage.maple simpleImage.* otheros.bld
 
 # clean up files cached by wrapper
-clean-kernel-base := vmlinux.strip vmlinux.bin
+clean-kernel-base := perkelex.strip perkelex.bin
 clean-kernel := $(addsuffix .gz,$(clean-kernel-base))
 clean-kernel += $(addsuffix .xz,$(clean-kernel-base))
 # clean-files are relative to $(obj).

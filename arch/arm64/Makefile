@@ -10,19 +10,19 @@
 #
 # Copyright (C) 1995-2001 by Russell King
 
-LDFLAGS_vmlinux	:=--no-undefined -X --pic-veneer
+LDFLAGS_perkelex	:=--no-undefined -X --pic-veneer
 
 ifeq ($(CONFIG_RELOCATABLE), y)
 # Pass --no-apply-dynamic-relocs to restore pre-binutils-2.27 behaviour
 # for relative relocs, since this leads to better Image compression
 # with the relocation offsets always being zero.
-LDFLAGS_vmlinux		+= -shared -Bsymbolic -z notext \
+LDFLAGS_perkelex		+= -shared -Bsymbolic -z notext \
 			$(call ld-option, --no-apply-dynamic-relocs)
 endif
 
 ifeq ($(CONFIG_ARM64_ERRATUM_843419),y)
   ifeq ($(CONFIG_ARM64_LD_HAS_FIX_ERRATUM_843419),y)
-LDFLAGS_vmlinux	+= --fix-cortex-a53-843419
+LDFLAGS_perkelex	+= --fix-cortex-a53-843419
   endif
 endif
 
@@ -164,22 +164,22 @@ libs-$(CONFIG_EFI_STUB) += $(objtree)/drivers/firmware/efi/libstub/lib.a
 # Default target when executing plain make
 boot		:= arch/arm64/boot
 
-BOOT_TARGETS	:= Image vmlinuz.efi image.fit
+BOOT_TARGETS	:= Image perkelez.efi image.fit
 
 PHONY += $(BOOT_TARGETS)
 
 ifeq ($(CONFIG_EFI_ZBOOT),)
 KBUILD_IMAGE	:= $(boot)/Image.gz
 else
-KBUILD_IMAGE	:= $(boot)/vmlinuz.efi
+KBUILD_IMAGE	:= $(boot)/perkelez.efi
 endif
 
 all:	$(notdir $(KBUILD_IMAGE))
 
 image.fit: dtbs
 
-vmlinuz.efi image.fit: Image
-$(BOOT_TARGETS): vmlinux
+perkelez.efi image.fit: Image
+$(BOOT_TARGETS): perkelex
 	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
 
 Image.%: Image

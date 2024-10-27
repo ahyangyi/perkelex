@@ -39,7 +39,7 @@ obj-$(CONFIG_PPC32)	+= div64.o copy_32.o crtsavres.o
 obj-$(CONFIG_FUNCTION_ERROR_INJECTION)	+= error-inject.o
 
 # See corresponding test in arch/powerpc/Makefile
-# 64-bit linker creates .sfpr on demand for final link (vmlinux),
+# 64-bit linker creates .sfpr on demand for final link (perkelex),
 # so it is only needed for modules, and only for older linkers which
 # do not support --save-restore-funcs
 ifndef CONFIG_LD_IS_BFD

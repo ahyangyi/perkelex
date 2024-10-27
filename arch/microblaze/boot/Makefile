@@ -7,7 +7,7 @@ targets := linux.bin linux.bin.gz linux.bin.ub simpleImage.*
 
 OBJCOPYFLAGS := -R .note -R .comment -R .note.gnu.build-id -O binary
 
-$(obj)/linux.bin: vmlinux FORCE
+$(obj)/linux.bin: perkelex FORCE
 	$(call if_changed,objcopy)
 
 $(obj)/linux.bin.ub: $(obj)/linux.bin FORCE
@@ -22,14 +22,14 @@ quiet_cmd_strip = STRIP   $< $@$2
 
 UIMAGE_LOADADDR = $(CONFIG_KERNEL_BASE_ADDR)
 
-$(obj)/simpleImage.$(DTB): vmlinux FORCE
+$(obj)/simpleImage.$(DTB): perkelex FORCE
 	$(call if_changed,objcopy)
 
 $(obj)/simpleImage.$(DTB).ub: $(obj)/simpleImage.$(DTB) FORCE
 	$(call if_changed,uimage)
 
-$(obj)/simpleImage.$(DTB).unstrip: vmlinux FORCE
+$(obj)/simpleImage.$(DTB).unstrip: perkelex FORCE
 	$(call if_changed,copy)
 
-$(obj)/simpleImage.$(DTB).strip: vmlinux FORCE
+$(obj)/simpleImage.$(DTB).strip: perkelex FORCE
 	$(call if_changed,strip)

@@ -6,13 +6,13 @@
 # for more details.
 #
 
-LDFLAGS_vmlinux := -z norelro
+LDFLAGS_perkelex := -z norelro
 ifeq ($(CONFIG_RELOCATABLE),y)
-	LDFLAGS_vmlinux += -shared -Bsymbolic -z notext --emit-relocs
+	LDFLAGS_perkelex += -shared -Bsymbolic -z notext --emit-relocs
 	KBUILD_CFLAGS += -fPIE
 endif
 ifeq ($(CONFIG_DYNAMIC_FTRACE),y)
-	LDFLAGS_vmlinux += --no-relax
+	LDFLAGS_perkelex += --no-relax
 	KBUILD_CPPFLAGS += -DCC_USING_PATCHABLE_FUNCTION_ENTRY
 ifeq ($(CONFIG_RISCV_ISA_C),y)
 	CC_FLAGS_FTRACE := -fpatchable-function-entry=4
@@ -146,7 +146,7 @@ else
 ifeq ($(CONFIG_EFI_ZBOOT),)
 KBUILD_IMAGE	:= $(boot)/Image.gz
 else
-KBUILD_IMAGE := $(boot)/vmlinuz.efi
+KBUILD_IMAGE := $(boot)/perkelez.efi
 endif
 endif
 endif
@@ -163,7 +163,7 @@ boot-image-$(CONFIG_KERNEL_XZ)		:= Image.xz
 ifdef CONFIG_RISCV_M_MODE
 boot-image-$(CONFIG_ARCH_CANAAN)	:= loader.bin
 endif
-boot-image-$(CONFIG_EFI_ZBOOT)		:= vmlinuz.efi
+boot-image-$(CONFIG_EFI_ZBOOT)		:= perkelez.efi
 boot-image-$(CONFIG_XIP_KERNEL)		:= xipImage
 KBUILD_IMAGE				:= $(boot)/$(boot-image-y)
 
@@ -184,14 +184,14 @@ endif
 vdso-install-y			+= arch/riscv/kernel/vdso/vdso.so.dbg
 vdso-install-$(CONFIG_COMPAT)	+= arch/riscv/kernel/compat_vdso/compat_vdso.so.dbg
 
-BOOT_TARGETS := Image Image.gz Image.bz2 Image.lz4 Image.lzma Image.lzo Image.zst Image.xz loader loader.bin xipImage vmlinuz.efi
+BOOT_TARGETS := Image Image.gz Image.bz2 Image.lz4 Image.lzma Image.lzo Image.zst Image.xz loader loader.bin xipImage perkelez.efi
 
 all:	$(notdir $(KBUILD_IMAGE))
 
 loader.bin: loader
-Image.gz Image.bz2 Image.lz4 Image.lzma Image.lzo Image.zst Image.xz loader xipImage vmlinuz.efi: Image
+Image.gz Image.bz2 Image.lz4 Image.lzma Image.lzo Image.zst Image.xz loader xipImage perkelez.efi: Image
 
-$(BOOT_TARGETS): vmlinux
+$(BOOT_TARGETS): perkelex
 	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
 	@$(kecho) '  Kernel: $(boot)/$@ is ready'
 
@@ -227,7 +227,7 @@ define archhelp
   echo  '  Image.lzo	- Compressed kernel image (arch/riscv/boot/Image.lzo)'
   echo  '  Image.zst	- Compressed kernel image (arch/riscv/boot/Image.zst)'
   echo  '  Image.xz	- Compressed kernel image (arch/riscv/boot/Image.xz)'
-  echo  '  vmlinuz.efi	- Compressed EFI kernel image (arch/riscv/boot/vmlinuz.efi)'
+  echo  '  perkelez.efi	- Compressed EFI kernel image (arch/riscv/boot/perkelez.efi)'
   echo  '		  Default when CONFIG_EFI_ZBOOT=y'
   echo  '  xipImage	- Execute-in-place kernel image (arch/riscv/boot/xipImage)'
   echo  '		  Default when CONFIG_XIP_KERNEL=y'

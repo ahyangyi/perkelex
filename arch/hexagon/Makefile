@@ -5,7 +5,7 @@ KBUILD_DEFCONFIG = comet_defconfig
 
 # Do not use GP-relative jumps
 KBUILD_CFLAGS += -G0
-LDFLAGS_vmlinux += -G0
+LDFLAGS_perkelex += -G0
 
 # Do not use single-byte enums; these will overflow.
 KBUILD_CFLAGS += -fno-short-enums

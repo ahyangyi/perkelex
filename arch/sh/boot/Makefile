@@ -26,24 +26,24 @@ suffix_$(CONFIG_KERNEL_LZMA)	:= lzma
 suffix_$(CONFIG_KERNEL_XZ)	:= xz
 suffix_$(CONFIG_KERNEL_LZO)	:= lzo
 
-targets := zImage vmlinux.srec romImage uImage uImage.srec uImage.gz \
+targets := zImage perkelex.srec romImage uImage uImage.srec uImage.gz \
 	   uImage.bz2 uImage.lzma uImage.xz uImage.lzo uImage.bin \
-	   vmlinux.bin vmlinux.bin.gz vmlinux.bin.bz2 vmlinux.bin.lzma \
-	   vmlinux.bin.xz vmlinux.bin.lzo
+	   perkelex.bin perkelex.bin.gz perkelex.bin.bz2 perkelex.bin.lzma \
+	   perkelex.bin.xz perkelex.bin.lzo
 subdir- := compressed romimage
 
-$(obj)/zImage: $(obj)/compressed/vmlinux FORCE
+$(obj)/zImage: $(obj)/compressed/perkelex FORCE
 	$(call if_changed,objcopy)
 	@echo '  Kernel: $@ is ready'
 
-$(obj)/compressed/vmlinux: FORCE
+$(obj)/compressed/perkelex: FORCE
 	$(Q)$(MAKE) $(build)=$(obj)/compressed $@
 
-$(obj)/romImage: $(obj)/romimage/vmlinux FORCE
+$(obj)/romImage: $(obj)/romimage/perkelex FORCE
 	$(call if_changed,objcopy)
 	@echo '  Kernel: $@ is ready'
 
-$(obj)/romimage/vmlinux: $(obj)/zImage FORCE
+$(obj)/romimage/perkelex: $(obj)/zImage FORCE
 	$(Q)$(MAKE) $(build)=$(obj)/romimage $@
 
 KERNEL_MEMORY	:= $(shell /bin/bash -c 'printf "0x%08x" \
@@ -62,44 +62,44 @@ KERNEL_ENTRY	:= $(shell /bin/bash -c 'printf "0x%08x" \
 UIMAGE_LOADADDR = $(KERNEL_LOAD)
 UIMAGE_ENTRYADDR = $(KERNEL_ENTRY)
 
-$(obj)/vmlinux.bin: vmlinux FORCE
+$(obj)/perkelex.bin: perkelex FORCE
 	$(call if_changed,objcopy)
 
-$(obj)/vmlinux.bin.gz: $(obj)/vmlinux.bin FORCE
+$(obj)/perkelex.bin.gz: $(obj)/perkelex.bin FORCE
 	$(call if_changed,gzip)
 
-$(obj)/vmlinux.bin.bz2: $(obj)/vmlinux.bin FORCE
+$(obj)/perkelex.bin.bz2: $(obj)/perkelex.bin FORCE
 	$(call if_changed,bzip2)
 
-$(obj)/vmlinux.bin.lzma: $(obj)/vmlinux.bin FORCE
+$(obj)/perkelex.bin.lzma: $(obj)/perkelex.bin FORCE
 	$(call if_changed,lzma)
 
-$(obj)/vmlinux.bin.xz: $(obj)/vmlinux.bin FORCE
+$(obj)/perkelex.bin.xz: $(obj)/perkelex.bin FORCE
 	$(call if_changed,xzkern)
 
-$(obj)/vmlinux.bin.lzo: $(obj)/vmlinux.bin FORCE
+$(obj)/perkelex.bin.lzo: $(obj)/perkelex.bin FORCE
 	$(call if_changed,lzo)
 
-$(obj)/uImage.bz2: $(obj)/vmlinux.bin.bz2 FORCE
+$(obj)/uImage.bz2: $(obj)/perkelex.bin.bz2 FORCE
 	$(call if_changed,uimage,bzip2)
 
-$(obj)/uImage.gz: $(obj)/vmlinux.bin.gz FORCE
+$(obj)/uImage.gz: $(obj)/perkelex.bin.gz FORCE
 	$(call if_changed,uimage,gzip)
 
-$(obj)/uImage.lzma: $(obj)/vmlinux.bin.lzma FORCE
+$(obj)/uImage.lzma: $(obj)/perkelex.bin.lzma FORCE
 	$(call if_changed,uimage,lzma)
 
-$(obj)/uImage.xz: $(obj)/vmlinux.bin.xz FORCE
+$(obj)/uImage.xz: $(obj)/perkelex.bin.xz FORCE
 	$(call if_changed,uimage,xz)
 
-$(obj)/uImage.lzo: $(obj)/vmlinux.bin.lzo FORCE
+$(obj)/uImage.lzo: $(obj)/perkelex.bin.lzo FORCE
 	$(call if_changed,uimage,lzo)
 
-$(obj)/uImage.bin: $(obj)/vmlinux.bin FORCE
+$(obj)/uImage.bin: $(obj)/perkelex.bin FORCE
 	$(call if_changed,uimage,none)
 
-OBJCOPYFLAGS_vmlinux.srec := -I binary -O srec
-$(obj)/vmlinux.srec: $(obj)/compressed/vmlinux FORCE
+OBJCOPYFLAGS_perkelex.srec := -I binary -O srec
+$(obj)/perkelex.srec: $(obj)/compressed/perkelex FORCE
 	$(call if_changed,objcopy)
 
 OBJCOPYFLAGS_uImage.srec := -I binary -O srec

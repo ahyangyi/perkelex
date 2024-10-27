@@ -37,14 +37,14 @@ HOST_LIBBPF_OUTPUT := $(OBJ_DIR)/host/libbpf/
 HOST_LIBBPF_DESTDIR := $(OUTPUT_DIR)/host/
 HOST_DESTDIR := $(OUTPUT_DIR)/host/
 
-VMLINUX_BTF_PATHS ?= $(if $(O),$(O)/vmlinux)					\
-		     $(if $(KBUILD_OUTPUT),$(KBUILD_OUTPUT)/vmlinux)		\
-		     ../../../../vmlinux					\
-		     /sys/kernel/btf/vmlinux					\
-		     /boot/vmlinux-$(shell uname -r)
+VMLINUX_BTF_PATHS ?= $(if $(O),$(O)/perkelex)					\
+		     $(if $(KBUILD_OUTPUT),$(KBUILD_OUTPUT)/perkelex)		\
+		     ../../../../perkelex					\
+		     /sys/kernel/btf/perkelex					\
+		     /boot/perkelex-$(shell uname -r)
 VMLINUX_BTF ?= $(abspath $(firstword $(wildcard $(VMLINUX_BTF_PATHS))))
 ifeq ($(VMLINUX_BTF),)
-$(error Cannot find a vmlinux for VMLINUX_BTF at any of "$(VMLINUX_BTF_PATHS)")
+$(error Cannot find a perkelex for VMLINUX_BTF at any of "$(VMLINUX_BTF_PATHS)")
 endif
 
 BPFTOOL ?= $(DEFAULT_BPFTOOL)
@@ -122,7 +122,7 @@ $(DEFAULT_BPFTOOL): $(wildcard $(BPFTOOLDIR)/*.[ch] $(BPFTOOLDIR)/Makefile)	\
 		    LIBBPF_DESTDIR=$(HOST_LIBBPF_DESTDIR)			\
 		    prefix= DESTDIR=$(HOST_DESTDIR) install-bin
 
-$(INCLUDE_DIR)/vmlinux.h: $(VMLINUX_BTF) $(BPFTOOL) | $(INCLUDE_DIR)
+$(INCLUDE_DIR)/perkelex.h: $(VMLINUX_BTF) $(BPFTOOL) | $(INCLUDE_DIR)
 ifeq ($(VMLINUX_H),)
 	$(call msg,GEN,,$@)
 	$(Q)$(BPFTOOL) btf dump file $(VMLINUX_BTF) format c > $@
@@ -131,11 +131,11 @@ else
 	$(Q)cp "$(VMLINUX_H)" $@
 endif
 
-$(SCXOBJ_DIR)/%.bpf.o: %.bpf.c $(INCLUDE_DIR)/vmlinux.h	| $(BPFOBJ) $(SCXOBJ_DIR)
+$(SCXOBJ_DIR)/%.bpf.o: %.bpf.c $(INCLUDE_DIR)/perkelex.h	| $(BPFOBJ) $(SCXOBJ_DIR)
 	$(call msg,CLNG-BPF,,$(notdir $@))
 	$(Q)$(CLANG) $(BPF_CFLAGS) -target bpf -c $< -o $@
 
-$(INCLUDE_DIR)/%.bpf.skel.h: $(SCXOBJ_DIR)/%.bpf.o $(INCLUDE_DIR)/vmlinux.h $(BPFTOOL) | $(INCLUDE_DIR)
+$(INCLUDE_DIR)/%.bpf.skel.h: $(SCXOBJ_DIR)/%.bpf.o $(INCLUDE_DIR)/perkelex.h $(BPFTOOL) | $(INCLUDE_DIR)
 	$(eval sched=$(notdir $@))
 	$(call msg,GEN-SKEL,,$(sched))
 	$(Q)$(BPFTOOL) gen object $(<:.o=.linked1.o) $<

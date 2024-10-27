@@ -201,7 +201,7 @@ _cpp_flags += $(addprefix -I, $(src) $(obj))
 endif
 endif
 
-# If $(is-kernel-object) is 'y', this object will be linked to vmlinux or modules
+# If $(is-kernel-object) is 'y', this object will be linked to perkelex or modules
 is-kernel-object = $(or $(part-of-builtin),$(part-of-module))
 
 part-of-builtin = $(if $(filter $(basename $@).o, $(real-obj-y) $(lib-y)),y)

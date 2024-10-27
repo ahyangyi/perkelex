@@ -34,28 +34,28 @@ KBUILD_AFLAGS := $(KBUILD_AFLAGS) -D__ASSEMBLY__ \
 	-DBOOT_HEAP_SIZE=$(BOOT_HEAP_SIZE) \
 	-DKERNEL_ENTRY=$(VMLINUX_ENTRY_ADDRESS)
 
-# decompressor objects (linked with vmlinuz)
-vmlinuzobjs-y := $(obj)/head.o $(obj)/decompress.o $(obj)/string.o $(obj)/bswapsi.o
+# decompressor objects (linked with perkelez)
+perkelezobjs-y := $(obj)/head.o $(obj)/decompress.o $(obj)/string.o $(obj)/bswapsi.o
 
 ifdef CONFIG_DEBUG_ZBOOT
-vmlinuzobjs-$(CONFIG_DEBUG_ZBOOT)		   += $(obj)/dbg.o
-vmlinuzobjs-$(CONFIG_SYS_SUPPORTS_ZBOOT_UART16550) += $(obj)/uart-16550.o
-vmlinuzobjs-$(CONFIG_SYS_SUPPORTS_ZBOOT_UART_PROM) += $(obj)/uart-prom.o
-vmlinuzobjs-$(CONFIG_MIPS_ALCHEMY)		   += $(obj)/uart-alchemy.o
-vmlinuzobjs-$(CONFIG_ATH79)			   += $(obj)/uart-ath79.o
+perkelezobjs-$(CONFIG_DEBUG_ZBOOT)		   += $(obj)/dbg.o
+perkelezobjs-$(CONFIG_SYS_SUPPORTS_ZBOOT_UART16550) += $(obj)/uart-16550.o
+perkelezobjs-$(CONFIG_SYS_SUPPORTS_ZBOOT_UART_PROM) += $(obj)/uart-prom.o
+perkelezobjs-$(CONFIG_MIPS_ALCHEMY)		   += $(obj)/uart-alchemy.o
+perkelezobjs-$(CONFIG_ATH79)			   += $(obj)/uart-ath79.o
 endif
 
-vmlinuzobjs-$(CONFIG_KERNEL_XZ) += $(obj)/ashldi3.o
+perkelezobjs-$(CONFIG_KERNEL_XZ) += $(obj)/ashldi3.o
 
-vmlinuzobjs-$(CONFIG_KERNEL_ZSTD) += $(obj)/bswapdi.o $(obj)/ashldi3.o $(obj)/clz_ctz.o
+perkelezobjs-$(CONFIG_KERNEL_ZSTD) += $(obj)/bswapdi.o $(obj)/ashldi3.o $(obj)/clz_ctz.o
 
-targets := $(notdir $(vmlinuzobjs-y))
+targets := $(notdir $(perkelezobjs-y))
 
-targets += vmlinux.bin
+targets += perkelex.bin
 
-OBJCOPYFLAGS_vmlinux.bin := $(OBJCOPYFLAGS) -O binary -R .comment -S
+OBJCOPYFLAGS_perkelex.bin := $(OBJCOPYFLAGS) -O binary -R .comment -S
 
-$(obj)/vmlinux.bin: $(KBUILD_IMAGE) FORCE
+$(obj)/perkelex.bin: $(KBUILD_IMAGE) FORCE
 	$(call if_changed,objcopy)
 
 tool_$(CONFIG_KERNEL_GZIP)    = gzip
@@ -66,23 +66,23 @@ tool_$(CONFIG_KERNEL_LZO)     = lzo_with_size
 tool_$(CONFIG_KERNEL_XZ)      = xzkern_with_size
 tool_$(CONFIG_KERNEL_ZSTD)    = zstd22_with_size
 
-targets += vmlinux.bin.z
+targets += perkelex.bin.z
 
-$(obj)/vmlinux.bin.z: $(obj)/vmlinux.bin FORCE
+$(obj)/perkelex.bin.z: $(obj)/perkelex.bin FORCE
 	$(call if_changed,$(tool_y))
 
 targets += piggy.o dummy.o
 
-OBJCOPYFLAGS_piggy.o := --add-section=.image=$(obj)/vmlinux.bin.z \
+OBJCOPYFLAGS_piggy.o := --add-section=.image=$(obj)/perkelex.bin.z \
 			--set-section-flags=.image=contents,alloc,load,readonly,data
 
-$(obj)/piggy.o: $(obj)/dummy.o $(obj)/vmlinux.bin.z FORCE
+$(obj)/piggy.o: $(obj)/dummy.o $(obj)/perkelex.bin.z FORCE
 	$(call if_changed,objcopy)
 
-HOSTCFLAGS_calc_vmlinuz_load_addr.o += $(LINUXINCLUDE)
+HOSTCFLAGS_calc_perkelez_load_addr.o += $(LINUXINCLUDE)
 
 # Calculate the load address of the compressed kernel image
-hostprogs := calc_vmlinuz_load_addr
+hostprogs := calc_perkelez_load_addr
 
 ifneq (0x0,$(CONFIG_ZBOOT_LOAD_ADDRESS))
 zload-y	= $(CONFIG_ZBOOT_LOAD_ADDRESS)
@@ -91,27 +91,27 @@ endif
 ifneq ($(zload-y),)
 VMLINUZ_LOAD_ADDRESS := $(zload-y)
 else
-VMLINUZ_LOAD_ADDRESS = $(shell $(obj)/calc_vmlinuz_load_addr \
-		$(obj)/vmlinux.bin $(LINKER_LOAD_ADDRESS))
+VMLINUZ_LOAD_ADDRESS = $(shell $(obj)/calc_perkelez_load_addr \
+		$(obj)/perkelex.bin $(LINKER_LOAD_ADDRESS))
 endif
 UIMAGE_LOADADDR = $(VMLINUZ_LOAD_ADDRESS)
 
-vmlinuzobjs-y += $(obj)/piggy.o
+perkelezobjs-y += $(obj)/piggy.o
 
-targets += ../../../../vmlinuz
+targets += ../../../../perkelez
 
 quiet_cmd_zld = LD      $@
-      cmd_zld = $(LD) $(KBUILD_LDFLAGS) -Ttext $(VMLINUZ_LOAD_ADDRESS) -T $< $(vmlinuzobjs-y) -o $@
+      cmd_zld = $(LD) $(KBUILD_LDFLAGS) -Ttext $(VMLINUZ_LOAD_ADDRESS) -T $< $(perkelezobjs-y) -o $@
 quiet_cmd_strip = STRIP   $@
       cmd_strip = $(STRIP) -s $@
 
-$(objtree)/vmlinuz: $(src)/ld.script $(vmlinuzobjs-y) $(obj)/calc_vmlinuz_load_addr
+$(objtree)/perkelez: $(src)/ld.script $(perkelezobjs-y) $(obj)/calc_perkelez_load_addr
 	$(call cmd,zld)
 	$(call cmd,strip)
 
 objboot := $(objtree)/arch/mips/boot
 
-$(objboot)/vmlinuz: $(objtree)/vmlinuz FORCE
+$(objboot)/perkelez: $(objtree)/perkelez FORCE
 
 #
 # Some DECstations need all possible sections of an ECOFF executable
@@ -124,44 +124,44 @@ endif
 hostprogs += ../elf2ecoff
 
 ifdef CONFIG_32BIT
-	VMLINUZ = $(objtree)/vmlinuz
+	VMLINUZ = $(objtree)/perkelez
 else
-	VMLINUZ = $(objboot)/vmlinuz.32
+	VMLINUZ = $(objboot)/perkelez.32
 endif
 
-targets += ../vmlinuz.32
+targets += ../perkelez.32
 
 quiet_cmd_32 = OBJCOPY $@
       cmd_32 = $(OBJCOPY) -O $(32bit-bfd) $(OBJCOPYFLAGS) $< $@
 
-$(objboot)/vmlinuz.32: $(objtree)/vmlinuz
+$(objboot)/perkelez.32: $(objtree)/perkelez
 	$(call cmd,32)
 
-targets += ../vmlinuz.ecoff
+targets += ../perkelez.ecoff
 
 quiet_cmd_ecoff = ECOFF	  $@
       cmd_ecoff = $< $(VMLINUZ) $@ $(e2eflag)
 
-$(objboot)/vmlinuz.ecoff: $(objboot)/elf2ecoff $(VMLINUZ)
+$(objboot)/perkelez.ecoff: $(objboot)/elf2ecoff $(VMLINUZ)
 	$(call cmd,ecoff)
 
-targets += ../vmlinuz.bin
+targets += ../perkelez.bin
 
-OBJCOPYFLAGS_vmlinuz.bin := $(OBJCOPYFLAGS) -O binary
+OBJCOPYFLAGS_perkelez.bin := $(OBJCOPYFLAGS) -O binary
 
-$(objboot)/vmlinuz.bin: $(objtree)/vmlinuz
+$(objboot)/perkelez.bin: $(objtree)/perkelez
 	$(call cmd,objcopy)
 
-targets += ../vmlinuz.srec
+targets += ../perkelez.srec
 
-OBJCOPYFLAGS_vmlinuz.srec := $(OBJCOPYFLAGS) -S -O srec
+OBJCOPYFLAGS_perkelez.srec := $(OBJCOPYFLAGS) -S -O srec
 
-$(objboot)/vmlinuz.srec: $(objtree)/vmlinuz
+$(objboot)/perkelez.srec: $(objtree)/perkelez
 	$(call cmd,objcopy)
 
 targets += ../uzImage.bin
 
-$(objboot)/uzImage.bin: $(objboot)/vmlinuz.bin FORCE
+$(objboot)/uzImage.bin: $(objboot)/perkelez.bin FORCE
 	$(call if_changed,uimage,none)
 
 #
@@ -175,15 +175,15 @@ ifeq ($(ADDR_BITS),64)
 itb_addr_cells = 2
 endif
 
-targets += ../vmlinuz.its.S
+targets += ../perkelez.its.S
 
 quiet_cmd_its_cat = CAT     $@
       cmd_its_cat = cat $(real-prereqs) >$@
 
-$(objboot)/vmlinuz.its.S: $(addprefix $(srctree)/arch/mips/$(PLATFORM)/,$(ITS_INPUTS)) FORCE
+$(objboot)/perkelez.its.S: $(addprefix $(srctree)/arch/mips/$(PLATFORM)/,$(ITS_INPUTS)) FORCE
 	$(call if_changed,its_cat)
 
-targets += ../vmlinuz.its
+targets += ../perkelez.its
 
 quiet_cmd_cpp_its_S = ITS     $@
       cmd_cpp_its_S = $(CPP) -P -C -o $@ $< \
@@ -195,10 +195,10 @@ quiet_cmd_cpp_its_S = ITS     $@
 			-DADDR_BITS=$(ADDR_BITS) \
 			-DADDR_CELLS=$(itb_addr_cells)
 
-$(objboot)/vmlinuz.its: $(objboot)/vmlinuz.its.S FORCE
-	$(call if_changed,cpp_its_S,vmlinuz.bin)
+$(objboot)/perkelez.its: $(objboot)/perkelez.its.S FORCE
+	$(call if_changed,cpp_its_S,perkelez.bin)
 
-targets += ../vmlinuz.itb
+targets += ../perkelez.itb
 
 quiet_cmd_itb-image = ITB     $@
       cmd_itb-image = \
@@ -209,5 +209,5 @@ quiet_cmd_itb-image = ITB     $@
 			--warning no-unit_address_vs_reg" \
 		-f $(2) $@
 
-$(objboot)/vmlinuz.itb: $(objboot)/vmlinuz.its $(objboot)/vmlinuz.bin FORCE
+$(objboot)/perkelez.itb: $(objboot)/perkelez.its $(objboot)/perkelez.bin FORCE
 	$(call if_changed,itb-image,$<)

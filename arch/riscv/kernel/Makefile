@@ -38,7 +38,7 @@ KASAN_SANITIZE_sbi_ecall.o := n
 endif
 endif
 
-extra-y += vmlinux.lds
+extra-y += perkelex.lds
 
 obj-y	+= head.o
 obj-y	+= soc.o

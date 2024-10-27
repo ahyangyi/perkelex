@@ -7,11 +7,11 @@ targets := image
 targets += bzImage
 subdir- := compressed
 
-$(obj)/image: vmlinux FORCE
+$(obj)/image: perkelex FORCE
 	$(call if_changed,objcopy)
 
-$(obj)/bzImage: $(if $(CONFIG_KERNEL_UNCOMPRESSED),$(objtree)/vmlinux,$(obj)/compressed/vmlinux) FORCE
+$(obj)/bzImage: $(if $(CONFIG_KERNEL_UNCOMPRESSED),$(objtree)/perkelex,$(obj)/compressed/perkelex) FORCE
 	$(call if_changed,objcopy)
 
-$(obj)/compressed/vmlinux: FORCE
+$(obj)/compressed/perkelex: FORCE
 	$(Q)$(MAKE) $(build)=$(obj)/compressed $@

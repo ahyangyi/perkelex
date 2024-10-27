@@ -94,7 +94,7 @@ endif
 cflags-y	+= -mdisable-fpregs
 
 # Use long jumps instead of long branches (needed if your linker fails to
-# link a too big vmlinux executable). Not enabled for building modules.
+# link a too big perkelex executable). Not enabled for building modules.
 ifdef CONFIG_MLONGCALLS
 KBUILD_CFLAGS_KERNEL += -mlong-calls
 endif
@@ -131,7 +131,7 @@ PALOCONF := $(shell if [ -f $(srctree)/palo.conf ]; then echo $(srctree)/palo.co
 	else echo $(objtree)/palo.conf; \
 	fi)
 
-palo lifimage: vmlinuz
+palo lifimage: perkelez
 	@if test ! -x "$(PALO)"; then \
 		echo 'ERROR: Please install palo first (apt-get install palo)';\
 		echo 'or build it from source and install it somewhere in your $$PATH';\
@@ -154,13 +154,13 @@ PHONY += bzImage $(BOOT_TARGETS) $(INSTALL_TARGETS)
 # Default kernel to build
 all: bzImage
 
-zImage: vmlinuz
-Image: vmlinux
+zImage: perkelez
+Image: perkelex
 
-bzImage: vmlinux
+bzImage: perkelex
 	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
 
-vmlinuz: bzImage
+perkelez: bzImage
 	$(OBJCOPY) $(boot)/bzImage $@
 
 ifeq ($(KBUILD_EXTMOD),)
@@ -180,8 +180,8 @@ endif
 vdso-install-y			+= arch/parisc/kernel/vdso32/vdso32.so
 vdso-install-$(CONFIG_64BIT)	+= arch/parisc/kernel/vdso64/vdso64.so
 
-install: KBUILD_IMAGE := vmlinux
-zinstall: KBUILD_IMAGE := vmlinuz
+install: KBUILD_IMAGE := perkelex
+zinstall: KBUILD_IMAGE := perkelez
 install zinstall:
 	$(call cmd,install)
 
@@ -189,14 +189,14 @@ CLEAN_FILES	+= lifimage
 MRPROPER_FILES	+= palo.conf
 
 define archhelp
-	@echo  '* vmlinux	- Uncompressed kernel image (./vmlinux)'
-	@echo  '  vmlinuz	- Compressed kernel image (./vmlinuz)'
+	@echo  '* perkelex	- Uncompressed kernel image (./perkelex)'
+	@echo  '  perkelez	- Compressed kernel image (./perkelez)'
 	@echo  '  palo		- Bootable image (./lifimage)'
-	@echo  '  install	- Install uncompressed vmlinux kernel using'
+	@echo  '  install	- Install uncompressed perkelex kernel using'
 	@echo  '		  (your) ~/bin/$(INSTALLKERNEL) or'
 	@echo  '		  (distribution) /sbin/$(INSTALLKERNEL) or'
 	@echo  '		  copy to $$(INSTALL_PATH)'
-	@echo  '  zinstall	- Install compressed vmlinuz kernel'
+	@echo  '  zinstall	- Install compressed perkelez kernel'
 endef
 
 archheaders:

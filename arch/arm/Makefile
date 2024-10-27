@@ -10,9 +10,9 @@
 #
 # Copyright (C) 1995-2001 by Russell King
 
-LDFLAGS_vmlinux	:= --no-undefined -X --pic-veneer -z norelro
+LDFLAGS_perkelex	:= --no-undefined -X --pic-veneer -z norelro
 ifeq ($(CONFIG_CPU_ENDIAN_BE8),y)
-LDFLAGS_vmlinux	+= --be8
+LDFLAGS_perkelex	+= --be8
 KBUILD_LDFLAGS_MODULE	+= --be8
 endif
 
@@ -296,7 +296,7 @@ PHONY += bzImage $(BOOT_TARGETS) $(INSTALL_TARGETS)
 bootpImage uImage: zImage
 zImage: Image
 
-$(BOOT_TARGETS): vmlinux
+$(BOOT_TARGETS): perkelex
 	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
 	@$(kecho) '  Kernel: $(boot)/$@ is ready'
 

@@ -11,7 +11,7 @@ CFLAGS_REMOVE_ftrace.o = -pg
 CFLAGS_REMOVE_process.o = -pg
 endif
 
-extra-y := vmlinux.lds
+extra-y := perkelex.lds
 
 obj-y += head.o dma.o exceptions.o \
 	hw_exception_handler.o irq.o \

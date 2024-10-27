@@ -83,14 +83,14 @@ endif
 HOST_BPFOBJ := $(HOST_BUILD_DIR)/libbpf/libbpf.a
 RESOLVE_BTFIDS := $(HOST_BUILD_DIR)/resolve_btfids/resolve_btfids
 
-VMLINUX_BTF_PATHS ?= $(if $(O),$(O)/vmlinux)				\
-		     $(if $(KBUILD_OUTPUT),$(KBUILD_OUTPUT)/vmlinux)	\
-		     ../../../../vmlinux				\
-		     /sys/kernel/btf/vmlinux				\
-		     /boot/vmlinux-$(shell uname -r)
+VMLINUX_BTF_PATHS ?= $(if $(O),$(O)/perkelex)				\
+		     $(if $(KBUILD_OUTPUT),$(KBUILD_OUTPUT)/perkelex)	\
+		     ../../../../perkelex				\
+		     /sys/kernel/btf/perkelex				\
+		     /boot/perkelex-$(shell uname -r)
 VMLINUX_BTF ?= $(abspath $(firstword $(wildcard $(VMLINUX_BTF_PATHS))))
 ifeq ($(VMLINUX_BTF),)
-$(error Cannot find a vmlinux for VMLINUX_BTF at any of "$(VMLINUX_BTF_PATHS)")
+$(error Cannot find a perkelex for VMLINUX_BTF at any of "$(VMLINUX_BTF_PATHS)")
 endif
 
 # Define simple and short `make test_progs`, `make test_sysctl`, etc targets
@@ -146,7 +146,7 @@ $(HOST_BPFOBJ): $(wildcard $(BPFDIR)/*.[ch] $(BPFDIR)/Makefile)		       \
 		    DESTDIR=$(HOST_SCRATCH_DIR)/ prefix= all install_headers
 endif
 
-$(INCLUDE_DIR)/vmlinux.h: $(VMLINUX_BTF) $(BPFTOOL) | $(INCLUDE_DIR)
+$(INCLUDE_DIR)/perkelex.h: $(VMLINUX_BTF) $(BPFTOOL) | $(INCLUDE_DIR)
 ifeq ($(VMLINUX_H),)
 	$(call msg,GEN,,$@)
 	$(Q)$(BPFTOOL) btf dump file $(VMLINUX_BTF) format c > $@
@@ -221,7 +221,7 @@ $(BPF_PROGS_DIR)-bpfobjs := y
 $(BPF_OBJS): $(OUTPUT)/%.bpf.o:				\
 	     $(BPF_PROGS_DIR)/%.c			\
 	     $(wildcard $(BPF_PROGS_DIR)/*.h)		\
-	     $(INCLUDE_DIR)/vmlinux.h				\
+	     $(INCLUDE_DIR)/perkelex.h				\
 	     $(wildcard $(BPFDIR)/hid_bpf_*.h)			\
 	     $(wildcard $(BPFDIR)/*.bpf.h)			\
 	     | $(OUTPUT) $(BPFOBJ)

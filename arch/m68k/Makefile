@@ -74,7 +74,7 @@ endif
 KBUILD_LDFLAGS := -m m68kelf
 
 ifdef CONFIG_SUN3
-LDFLAGS_vmlinux = -N
+LDFLAGS_perkelex = -N
 endif
 
 CHECKFLAGS += -D__mc68000__
@@ -91,44 +91,44 @@ libs-y				+= arch/m68k/lib/
 
 all:	zImage
 
-lilo:	vmlinux
-	if [ -f $(INSTALL_PATH)/vmlinux ]; then mv -f $(INSTALL_PATH)/vmlinux $(INSTALL_PATH)/vmlinux.old; fi
+lilo:	perkelex
+	if [ -f $(INSTALL_PATH)/perkelex ]; then mv -f $(INSTALL_PATH)/perkelex $(INSTALL_PATH)/perkelex.old; fi
 	if [ -f $(INSTALL_PATH)/System.map ]; then mv -f $(INSTALL_PATH)/System.map $(INSTALL_PATH)/System.old; fi
-	cat vmlinux > $(INSTALL_PATH)/vmlinux
+	cat perkelex > $(INSTALL_PATH)/perkelex
 	cp System.map $(INSTALL_PATH)/System.map
 	if [ -x /sbin/lilo ]; then /sbin/lilo; else /etc/lilo/install; fi
 
-zImage compressed: vmlinux.gz
+zImage compressed: perkelex.gz
 
-vmlinux.gz: vmlinux
-
-ifndef CONFIG_KGDB
-	cp vmlinux vmlinux.tmp
-	$(STRIP) vmlinux.tmp
-	$(KGZIP) -9c vmlinux.tmp >vmlinux.gz
-	rm vmlinux.tmp
-else
-	$(KGZIP) -9c vmlinux >vmlinux.gz
-endif
-
-bzImage: vmlinux.bz2
-
-vmlinux.bz2: vmlinux
+perkelex.gz: perkelex
 
 ifndef CONFIG_KGDB
-	cp vmlinux vmlinux.tmp
-	$(STRIP) vmlinux.tmp
-	$(KBZIP2) -1c vmlinux.tmp >vmlinux.bz2
-	rm vmlinux.tmp
+	cp perkelex perkelex.tmp
+	$(STRIP) perkelex.tmp
+	$(KGZIP) -9c perkelex.tmp >perkelex.gz
+	rm perkelex.tmp
 else
-	$(KBZIP2) -1c vmlinux >vmlinux.bz2
+	$(KGZIP) -9c perkelex >perkelex.gz
 endif
 
-CLEAN_FILES += vmlinux.gz vmlinux.bz2
+bzImage: perkelex.bz2
+
+perkelex.bz2: perkelex
+
+ifndef CONFIG_KGDB
+	cp perkelex perkelex.tmp
+	$(STRIP) perkelex.tmp
+	$(KBZIP2) -1c perkelex.tmp >perkelex.bz2
+	rm perkelex.tmp
+else
+	$(KBZIP2) -1c perkelex >perkelex.bz2
+endif
+
+CLEAN_FILES += perkelex.gz perkelex.bz2
 
 archheaders:
 	$(Q)$(MAKE) $(build)=arch/m68k/kernel/syscalls all
 
-install: KBUILD_IMAGE := vmlinux.gz
+install: KBUILD_IMAGE := perkelex.gz
 install:
 	$(call cmd,install)

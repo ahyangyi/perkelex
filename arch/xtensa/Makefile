@@ -63,7 +63,7 @@ libs-y		+= arch/xtensa/lib/
 
 boot		:= arch/xtensa/boot
 
-all Image zImage uImage xipImage: vmlinux
+all Image zImage uImage xipImage: perkelex
 	$(Q)$(MAKE) $(build)=$(boot) $@
 
 archheaders:

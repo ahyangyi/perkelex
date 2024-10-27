@@ -66,23 +66,23 @@ cflags-y += $(call cc-option, -mno-check-zero-division)
 
 ifdef CONFIG_32BIT
 ld-emul			= $(32bit-emul)
-vmlinux-32		= vmlinux
-vmlinux-64		= vmlinux.64
+perkelex-32		= perkelex
+perkelex-64		= perkelex.64
 
 cflags-y		+= -mabi=32
 endif
 
 ifdef CONFIG_64BIT
 ld-emul			= $(64bit-emul)
-vmlinux-32		= vmlinux.32
-vmlinux-64		= vmlinux
+perkelex-32		= perkelex.32
+perkelex-64		= perkelex
 
 cflags-y		+= -mabi=64
 endif
 
-all-$(CONFIG_BOOT_ELF32)	:= $(vmlinux-32)
-all-$(CONFIG_BOOT_ELF64)	:= $(vmlinux-64)
-all-$(CONFIG_SYS_SUPPORTS_ZBOOT)+= vmlinuz
+all-$(CONFIG_BOOT_ELF32)	:= $(perkelex-32)
+all-$(CONFIG_BOOT_ELF64)	:= $(perkelex-64)
+all-$(CONFIG_SYS_SUPPORTS_ZBOOT)+= perkelez
 
 #
 # GCC uses -G 0 -mabicalls -fpic as default.  We don't want PIC in the kernel
@@ -96,12 +96,12 @@ all-$(CONFIG_SYS_SUPPORTS_ZBOOT)+= vmlinuz
 #
 cflags-y			+= -G 0 -mno-abicalls -fno-pic -pipe
 cflags-y			+= -msoft-float -Wa,-msoft-float
-LDFLAGS_vmlinux			+= -G 0 -static -n -nostdlib
+LDFLAGS_perkelex			+= -G 0 -static -n -nostdlib
 KBUILD_AFLAGS_MODULE		+= -mlong-calls
 KBUILD_CFLAGS_MODULE		+= -mlong-calls
 
 ifeq ($(CONFIG_RELOCATABLE),y)
-LDFLAGS_vmlinux			+= --emit-relocs
+LDFLAGS_perkelex			+= --emit-relocs
 endif
 
 cflags-y += -ffreestanding
@@ -270,9 +270,9 @@ libs-y				+= arch/mips/fw/lib/
 # Kernel compression
 #
 ifdef CONFIG_SYS_SUPPORTS_ZBOOT
-COMPRESSION_FNAME		= vmlinuz
+COMPRESSION_FNAME		= perkelez
 else
-COMPRESSION_FNAME		= vmlinux
+COMPRESSION_FNAME		= perkelex
 endif
 
 #
@@ -284,7 +284,7 @@ ifdef CONFIG_PHYSICAL_START
 load-y					= $(CONFIG_PHYSICAL_START)
 endif
 
-entry-y				= $(shell $(objtree)/arch/mips/tools/elf-entry vmlinux)
+entry-y				= $(shell $(objtree)/arch/mips/tools/elf-entry perkelex)
 cflags-y			+= -I$(srctree)/arch/mips/include/asm/mach-generic
 drivers-$(CONFIG_PCI)		+= arch/mips/pci/
 
@@ -360,28 +360,28 @@ drivers-y			+= arch/mips/crypto/
 drivers-$(CONFIG_PM)	+= arch/mips/power/
 
 # boot image targets (arch/mips/boot/)
-boot-y			:= vmlinux.bin
-boot-y			+= vmlinux.ecoff
-boot-y			+= vmlinux.srec
+boot-y			:= perkelex.bin
+boot-y			+= perkelex.ecoff
+boot-y			+= perkelex.srec
 boot-y			+= uImage
 boot-y			+= uImage.bin
 boot-y			+= uImage.bz2
 boot-y			+= uImage.gz
 boot-y			+= uImage.lzma
 boot-y			+= uImage.lzo
-boot-y			+= vmlinux.itb
-boot-y			+= vmlinux.gz.itb
-boot-y			+= vmlinux.bz2.itb
-boot-y			+= vmlinux.lzma.itb
-boot-y			+= vmlinux.lzo.itb
+boot-y			+= perkelex.itb
+boot-y			+= perkelex.gz.itb
+boot-y			+= perkelex.bz2.itb
+boot-y			+= perkelex.lzma.itb
+boot-y			+= perkelex.lzo.itb
 
 # compressed boot image targets (arch/mips/boot/compressed/)
-bootz-y			:= vmlinuz
-bootz-y			+= vmlinuz.bin
-bootz-y			+= vmlinuz.ecoff
-bootz-y			+= vmlinuz.srec
+bootz-y			:= perkelez
+bootz-y			+= perkelez.bin
+bootz-y			+= perkelez.ecoff
+bootz-y			+= perkelez.srec
 bootz-y			+= uzImage.bin
-bootz-y			+= vmlinuz.itb
+bootz-y			+= perkelez.itb
 
 #
 # Some machines like the Indy need 32-bit ELF binaries for booting purposes.
@@ -390,7 +390,7 @@ bootz-y			+= vmlinuz.itb
 #
 quiet_cmd_32 = OBJCOPY $@
 	cmd_32 = $(OBJCOPY) -O $(32bit-bfd) $(OBJCOPYFLAGS) $< $@
-vmlinux.32: vmlinux
+perkelex.32: perkelex
 	$(call cmd,32)
 
 #
@@ -399,29 +399,29 @@ vmlinux.32: vmlinux
 #
 quiet_cmd_64 = OBJCOPY $@
 	cmd_64 = $(OBJCOPY) -O $(64bit-bfd) $(OBJCOPYFLAGS) $< $@
-vmlinux.64: vmlinux
+perkelex.64: perkelex
 	$(call cmd,64)
 
 all:	$(all-y) $(KBUILD_DTBS)
 
 # boot
-$(boot-y): $(vmlinux-32) FORCE
-	$(Q)$(MAKE) $(build)=arch/mips/boot VMLINUX=$(vmlinux-32) \
+$(boot-y): $(perkelex-32) FORCE
+	$(Q)$(MAKE) $(build)=arch/mips/boot VMLINUX=$(perkelex-32) \
 		$(bootvars-y) arch/mips/boot/$@
 
 ifdef CONFIG_SYS_SUPPORTS_ZBOOT
 # boot/compressed
-$(bootz-y): $(vmlinux-32) FORCE
+$(bootz-y): $(perkelex-32) FORCE
 	$(Q)$(MAKE) $(build)=arch/mips/boot/compressed \
 		$(bootvars-y) 32bit-bfd=$(32bit-bfd) arch/mips/boot/$@
 else
-vmlinuz: FORCE
+perkelez: FORCE
 	@echo '   CONFIG_SYS_SUPPORTS_ZBOOT is not enabled'
 	/bin/false
 endif
 
 
-CLEAN_FILES += vmlinux.32 vmlinux.64
+CLEAN_FILES += perkelex.32 perkelex.64
 
 # device-trees
 core-y += arch/mips/boot/dts/
@@ -437,9 +437,9 @@ ifdef CONFIG_MIPS32_O32
 endif
 
 install:
-	$(Q)install -D -m 755 vmlinux $(INSTALL_PATH)/vmlinux-$(KERNELRELEASE)
+	$(Q)install -D -m 755 perkelex $(INSTALL_PATH)/perkelex-$(KERNELRELEASE)
 ifdef CONFIG_SYS_SUPPORTS_ZBOOT
-	$(Q)install -D -m 755 vmlinuz $(INSTALL_PATH)/vmlinuz-$(KERNELRELEASE)
+	$(Q)install -D -m 755 perkelez $(INSTALL_PATH)/perkelez-$(KERNELRELEASE)
 endif
 	$(Q)install -D -m 644 .config $(INSTALL_PATH)/config-$(KERNELRELEASE)
 	$(Q)install -D -m 644 System.map $(INSTALL_PATH)/System.map-$(KERNELRELEASE)
@@ -449,14 +449,14 @@ archheaders:
 
 define archhelp
 	echo '  install              - install kernel into $(INSTALL_PATH)'
-	echo '  vmlinux.ecoff        - ECOFF boot image'
-	echo '  vmlinux.bin          - Raw binary boot image'
-	echo '  vmlinux.srec         - SREC boot image'
-	echo '  vmlinux.32           - 64-bit boot image wrapped in 32bits (IP22/IP32)'
-	echo '  vmlinuz              - Compressed boot(zboot) image'
-	echo '  vmlinuz.ecoff        - ECOFF zboot image'
-	echo '  vmlinuz.bin          - Raw binary zboot image'
-	echo '  vmlinuz.srec         - SREC zboot image'
+	echo '  perkelex.ecoff        - ECOFF boot image'
+	echo '  perkelex.bin          - Raw binary boot image'
+	echo '  perkelex.srec         - SREC boot image'
+	echo '  perkelex.32           - 64-bit boot image wrapped in 32bits (IP22/IP32)'
+	echo '  perkelez              - Compressed boot(zboot) image'
+	echo '  perkelez.ecoff        - ECOFF zboot image'
+	echo '  perkelez.bin          - Raw binary zboot image'
+	echo '  perkelez.srec         - SREC zboot image'
 	echo '  uImage               - U-Boot image'
 	echo '  uImage.bin           - U-Boot image (uncompressed)'
 	echo '  uImage.bz2           - U-Boot image (bz2)'

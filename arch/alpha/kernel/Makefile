@@ -3,7 +3,7 @@
 # Makefile for the linux kernel.
 #
 
-extra-y		:= vmlinux.lds
+extra-y		:= perkelex.lds
 asflags-y	:= $(KBUILD_CFLAGS)
 ccflags-y	:= -Wno-sign-compare
 
